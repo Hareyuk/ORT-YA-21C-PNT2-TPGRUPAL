@@ -8,7 +8,7 @@ import {
   Linking,
   Image,
 } from "react-native";
-import estilos from "./estilos";
+import estilos from "./estiloSignUp";
 
 export default function SignUp() {
   const [usuario, setUsuario] = useState("");
@@ -33,7 +33,7 @@ export default function SignUp() {
     <ScrollView contentContainerStyle={estilos.contenedor}>
       <View style={estilos.encabezado}>
         <Image
-          source={require("../../assets/icon.png")}
+          source={require("../../../assets/icon.png")}
           style={estilos.logo}
         />
         <Text style={estilos.tituloPrincipal}>Zoro Defenders TCG</Text>
