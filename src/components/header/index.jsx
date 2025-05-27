@@ -57,9 +57,9 @@ export default function Header() {
             position: "relative",
             flexDirection: "row",
             height: 50,
-            padding: 20,
+            padding: 20,/* 
             borderBottomWidth: 1,
-            borderBottomColor: "#ddd",
+            borderBottomColor: "#c2854c", */
             maxWidth: 1920,
             alignItems: "center",
         },
