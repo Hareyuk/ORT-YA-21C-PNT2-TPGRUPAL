@@ -1,13 +1,21 @@
 import { Link } from "expo-router";
-import { ImageBackground, StyleSheet, Text } from "react-native";
+import { ImageBackground, StyleSheet, Text, View } from "react-native";
 
-const Button = ({ href, customStyle, children }) => {
+const Button = ({ href, customStyle, children, cb }) => {
   return (
+    href != null 
+    ?
     <Link href={href} style={customStyle != null ? customStyle : styles.generalButton}>
         <ImageBackground source={require('../../../assets/img/ui_button.png')} style={styles.img_ui}>       
             <Text style={styles.txtButton}>{children}</Text>
         </ImageBackground>
     </Link>
+    :
+    <View style={customStyle != null ? customStyle : styles.generalButton} onPress={cb}>
+        <ImageBackground source={require('../../../assets/img/ui_button.png')} style={styles.img_ui}>       
+            <Text style={styles.txtButton}>{children}</Text>
+        </ImageBackground>
+    </View>
   );
 };
 
@@ -35,6 +43,7 @@ const styles = StyleSheet.create({
   {
     fontWeight: "bold",
     fontSize: "1.2em",
+    textAlign: "center",
   }
 });
 
