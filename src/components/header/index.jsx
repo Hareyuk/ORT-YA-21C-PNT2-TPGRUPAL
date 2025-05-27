@@ -39,8 +39,10 @@ export default function Header() {
                     <Link href="/" style={styles.itemLink}>Home</Link>
                     <Link href="/login" style={styles.itemLink}>Login</Link>
                     <Link href="/signup" style={styles.itemLink}>Registro</Link>
-                    <Link href="/game" style={styles.itemLink}>Juego</Link>
                     <Link href="/lobby" style={styles.itemLink}>Lobby</Link>
+                    <Link href="/game" style={styles.itemLink}>Juego</Link>
+                    <Link href="/profile" style={styles.itemLink}>Perfil</Link>
+                    <Link href="/editProfile" style={styles.itemLink}>Editar perfil</Link>
                 </Text>
             </MenuNav>
         </View>
