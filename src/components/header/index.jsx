@@ -36,13 +36,13 @@ export default function Header() {
             <MenuNav posXMenu={posXMenu}>
                 <Entypo name="cross" size={30} color="white" onPress={toggleMenu} />
                 <Text style={[styles.whiteText, styles.menuNavBar]}>
-                    <Link href="/" style={styles.itemLink}>Home</Link>
-                    <Link href="/login" style={styles.itemLink}>Login</Link>
-                    <Link href="/signup" style={styles.itemLink}>Registro</Link>
-                    <Link href="/lobby" style={styles.itemLink}>Lobby</Link>
-                    <Link href="/game" style={styles.itemLink}>Juego</Link>
-                    <Link href="/profile" style={styles.itemLink}>Perfil</Link>
-                    <Link href="/editProfile" style={styles.itemLink}>Editar perfil</Link>
+                    <Link href="/" style={styles.itemLink} onPress={toggleMenu}>Home</Link>
+                    <Link href="/login" style={styles.itemLink} onPress={toggleMenu}>Login</Link>
+                    <Link href="/signup" style={styles.itemLink} onPress={toggleMenu}>Registro</Link>
+                    <Link href="/lobby" style={styles.itemLink} onPress={toggleMenu}>Lobby</Link>
+                    <Link href="/game" style={styles.itemLink} onPress={toggleMenu}>Juego</Link>
+                    <Link href="/profile" style={styles.itemLink} onPress={toggleMenu}>Perfil</Link>
+                    <Link href="/editProfile" style={styles.itemLink} onPress={toggleMenu}>Editar perfil</Link>
                 </Text>
             </MenuNav>
         </View>
