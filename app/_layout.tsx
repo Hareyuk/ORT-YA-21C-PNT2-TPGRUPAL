@@ -1,15 +1,15 @@
 import { Link, Slot } from 'expo-router';
 import Header from '../src/components/header';
 import Footer from '../src/components/footer';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, SafeAreaView } from 'react-native';
 export default function Layout() {
   return (
     <>
-    <View style={{flexDirection: 'column-reverse'}}>
+    <SafeAreaView style={{flexDirection: 'column-reverse', flex: 1}}>
       <Footer />
-        <Slot />
+      <Slot />
       <Header />
-    </View>
+    </SafeAreaView>
     </>
   );
 }
