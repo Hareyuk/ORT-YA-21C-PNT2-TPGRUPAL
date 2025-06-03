@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export default StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#2e2e2e',
+    backgroundColor: '#2e2e2e', // Fondo oscuro
     justifyContent: 'space-between',
   },
   header: {
@@ -21,18 +21,20 @@ export default StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     padding: 20,
-    gap: 20,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 20,
   },
-  image: {
-    width: 150,
-    height: 150,
-    backgroundColor: '#ccc',
+  avatar: {
+    width: 200,
+    height: 200,
+    resizeMode: 'contain',
+    marginRight: 20,
+    backgroundColor: '#ccc', // solo como placeholder
   },
   textContainer: {
     flex: 1,
-    maxWidth: 300,
+    maxWidth: 400,
   },
   title: {
     fontSize: 20,
@@ -49,4 +51,16 @@ export default StyleSheet.create({
     backgroundColor: '#3c3c3c',
     alignItems: 'center',
   },
+
+  contentWrapper: {
+  flexDirection: 'row',
+  flexWrap: 'wrap', // permite que en pantallas chicas se apile
+  justifyContent: 'center',
+  alignItems: 'center',
+  maxWidth: 900,
+  width: '100%',
+  gap: 40,
+},
+
+
 });
