@@ -2,8 +2,12 @@ import { StyleSheet, Text, View, ImageBackground, Image, ScrollView } from "reac
 import { Link } from "expo-router";
 import Button from "../src/components/button";
 import { withTheme } from "styled-components";
+import { useAuthUser } from "../hooks/userLogged";
 
 export default function Page() {
+
+    const { isUserLogged } = useAuthUser();
+
   const cardPreviews = [{
     text: "piedra",
     src: require("../assets/img/card_preview_1.jpg")
@@ -16,7 +20,6 @@ export default function Page() {
     text: "papel",
     src: require("../assets/img/card_preview_3.jpg")
   }];
-
   const previewCardHTML = (text, src)=>{
     return(
     <View style={styles.containerCardPreview}>
@@ -34,15 +37,24 @@ export default function Page() {
         <View style={styles.landingGameContainer}>
           <ImageBackground source={require('../assets/img/landing.jpg')} style={styles.landingGameBg}>
             <View style={styles.landingContainerBtns}>
-              <Button href='/signup'>
-                Registrarse
-              </Button>
-              <Button href='/login'>
-                Iniciar sesión
-              </Button>
-              <Button href='/lobby'>
-                Ingresar al lobby
-              </Button>
+              {
+                isUserLogged
+                ?
+                <>
+                  <Button href='/lobby'>
+                    Ingresar al lobby
+                  </Button>
+                </>
+                :
+                <>
+                  <Button href='/signup'>
+                    Registrarse
+                  </Button>
+                  <Button href='/login'>
+                    Iniciar sesión
+                  </Button>
+                </>
+              }
             </View>
           </ImageBackground>
         </View>

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Button, Platform } from "react-native";
 import Entypo from '@expo/vector-icons/Entypo';
 import { useState } from "react";
 import styled from "styled-components/native";
+import { useAuthUser } from "../../../hooks/userLogged";
 
 const MenuNav = styled.View`
         z-index: 15;
@@ -20,12 +21,20 @@ const MenuNav = styled.View`
         `;
 
 export default function Header() {
-
+    //Obtener datos del context
+    const { isUserLogged, logOutUser } = useAuthUser();
+    
     const posXActive = "-350px";
     const posXInactive = "350px";
 
     const [posXMenu, setPosXMenu] = useState(posXInactive);
     const toggleMenu = () => { posXMenu === posXActive ? setPosXMenu(posXInactive) : setPosXMenu(posXActive) }
+    
+    const cerrarSesion = ()=>
+    {
+        logOutUser();
+        toggleMenu();
+    }
     
     return (
         <View style={styles.header}>
@@ -37,12 +46,20 @@ export default function Header() {
                 <Entypo name="cross" size={30} color="white" onPress={toggleMenu} />
                 <Text style={[styles.whiteText, styles.menuNavBar]}>
                     <Link href="/" style={styles.itemLink} onPress={toggleMenu}>Home</Link>
-                    <Link href="/login" style={styles.itemLink} onPress={toggleMenu}>Login</Link>
-                    <Link href="/signup" style={styles.itemLink} onPress={toggleMenu}>Registro</Link>
-                    <Link href="/lobby" style={styles.itemLink} onPress={toggleMenu}>Lobby</Link>
-                    <Link href="/game" style={styles.itemLink} onPress={toggleMenu}>Juego</Link>
-                    <Link href="/profile" style={styles.itemLink} onPress={toggleMenu}>Perfil</Link>
-                    <Link href="/editProfile" style={styles.itemLink} onPress={toggleMenu}>Editar perfil</Link>
+                    {isUserLogged ?
+                    <>                         
+                        <Link href="/lobby" style={styles.itemLink} onPress={toggleMenu}>Lobby</Link>
+                        <Link href="/game" style={styles.itemLink} onPress={toggleMenu}>Juego</Link>
+                        <Link href="/profile" style={styles.itemLink} onPress={toggleMenu}>Perfil</Link>
+                        <Link href="/editProfile" style={styles.itemLink} onPress={toggleMenu}>Editar perfil</Link>
+                        <Link href="/" style={styles.itemLink} onPress={cerrarSesion}>Cerrar sesión</Link>
+                    </>
+                    :
+                    <>
+                        <Link href="/login" style={styles.itemLink} onPress={toggleMenu}>Login</Link>
+                        <Link href="/signup" style={styles.itemLink} onPress={toggleMenu}>Registro</Link>
+                    </>
+                    }
                 </Text>
             </MenuNav>
         </View>

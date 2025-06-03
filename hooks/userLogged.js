@@ -1,24 +1,48 @@
 import { useContext, useState, createContext } from "react";
 
-const UserLoggedStatus = createContext(false);
+const UserLoggedStatusContext = createContext(
+  {
+    isUserLogged: false,
+    logInUser: () => {},
+    logOutUser: () => {},
+    dataUser: null
+  }
+);
 
-export function UserLoggedStatus({ children }) {
+export function UserLoggedStatusProvider({ children }) {
   const [isUserLogged, setIsUserLogged] = useState(false);
-  const logInUser = () => setIsUserLogged(true);
-  const logOutUser = () => setIsUserLogged(false);
+  const [dataUser, setDataUser] = useState();
+  const logInUser = (data) => {
+    //Request user login here
+    console.log("Usuario logeado: ", data);
+    
+    setIsUserLogged(true);
+  }
+  const logOutUser = () => {
+    //Close
+    console.log("Sesión cerrada");
+    setIsUserLogged(false)
+  };
+
+  const value = {
+    isUserLogged,
+    logInUser,
+    logOutUser,
+    dataUser
+  };
+
   return (
-    <UserLoggedStatus.Provider value={{ isUserLogged, logInUser, logOutUser }}>
+    <UserLoggedStatusContext.Provider value={value}>
       {children}
-    </UserLoggedStatus.Provider>
+    </UserLoggedStatusContext.Provider>
   );
 };
 
-export function authUser()
+export function useAuthUser()
 {
-    const isUserLogged = useContext(UserLoggedStatus);
-    if(!isUserLogged)
-    {
-        throw new Error("Not logged in");
-    }
-    return isUserLogged;
+    const context = useContext(UserLoggedStatusContext);
+    if (!context) {
+      throw new Error("useAuthUser must be used within UserLoggedStatusProvider");
+  }
+    return context;
 }
