@@ -46,6 +46,7 @@ export default function Header() {
                 <Entypo name="cross" size={30} color="white" onPress={toggleMenu} />
                 <Text style={[styles.whiteText, styles.menuNavBar]}>
                     <Link href="/" style={styles.itemLink} onPress={toggleMenu}>Home</Link>
+                     <Link href="/about" style={styles.itemLink} onPress={toggleMenu}>About Us</Link> 
                     {isUserLogged ?
                     <>                         
                         <Link href="/lobby" style={styles.itemLink} onPress={toggleMenu}>Lobby</Link>
