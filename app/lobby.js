@@ -5,7 +5,7 @@ import { useState } from "react";
 
 export default function LobbyView() {
 
-  const [isChecked, setChecked] = useState(false);
+  const [isChecked, setChecked] = useState(false); //For private rooms
   const onSearchRoom = ()=>
   {
     console.log("Buscar");
@@ -13,18 +13,14 @@ export default function LobbyView() {
 
   const onCreateRoom = ()=>
   {
-    console.log("Buscar");
+    console.log("Crear room");
   }
   
   const onChooseRoom = ()=>
   {
-    console.log("Buscar");
+    console.log("Elegir room");
   }
 
-  const onPlayRandom = ()=>
-  {
-    console.log("Buscar");
-  }
   return (
     <View style={styles.container}>
       <View style={styles.lobby}>
