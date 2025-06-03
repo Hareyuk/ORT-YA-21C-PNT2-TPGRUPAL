@@ -5,7 +5,7 @@ return (
     <View style={styles.footer}>
         <View style={styles.containerFooter}>
             <Text style={[styles.whiteText, styles.logoFooter]}>Logo</Text>
-            <Text style={styles.whiteText}>©Axel Dumas, Martín Palma y Dylan Sosa - 2025</Text>
+            <Text style={styles.whiteText}>©Axel Dumas, Martín Palma y Dylan Sosa Domecq - 2025</Text>
         </View>
     </View>
 );
