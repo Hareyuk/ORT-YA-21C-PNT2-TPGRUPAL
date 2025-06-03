@@ -1,21 +1,21 @@
 import { Link } from "expo-router";
-import { ImageBackground, StyleSheet, Text, View } from "react-native";
+import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const Button = ({ href, customStyle, children, cb }) => {
+const Button = ({ href, children, cb }) => {
   return (
     href != null 
     ?
-    <Link href={href} style={customStyle != null ? customStyle : styles.generalButton}>
+    <Link href={href} style={[styles.generalButton]}>
         <ImageBackground source={require('../../../assets/img/ui_button.png')} style={styles.img_ui}>       
-            <Text style={styles.txtButton}>{children}</Text>
+            <Text style={[styles.txtButton]}>{children}</Text>
         </ImageBackground>
     </Link>
     :
-    <View style={customStyle != null ? customStyle : styles.generalButton} onPress={cb}>
+    <TouchableOpacity style={[styles.generalButton]} onPress={cb}>
         <ImageBackground source={require('../../../assets/img/ui_button.png')} style={styles.img_ui}>       
-            <Text style={styles.txtButton}>{children}</Text>
+            <Text style={[styles.txtButton]}>{children}</Text>
         </ImageBackground>
-    </View>
+    </TouchableOpacity>
   );
 };
 
@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     width: "250px",
     paddingHorizontal: 0,
     paddingVertical: 0,
+    cursor: "pointer"
   },
   img_ui:
   {
@@ -44,6 +45,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: "1.2em",
     textAlign: "center",
+  },
+  smaller:
+  {
+    width: "200px",
+    fontSize: "0.9em"
   }
 });
 
