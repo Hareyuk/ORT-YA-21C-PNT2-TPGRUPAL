@@ -1,10 +1,14 @@
 import { View, Text, StyleSheet, TextInput, Image } from "react-native";
 import Button from "../src/components/button";
 import Checkbox from 'expo-checkbox';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Room from "../src/components/room/room";
+import LoadingScreen from "../src/components/loading/loading";
+import { navigate } from "expo-router/build/global-state/routing";
 
 export default function LobbyView() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChecked, setChecked] = useState(false); //For private rooms
   let placeholderRoom =
   {
     isPlaying: false,
@@ -18,7 +22,6 @@ export default function LobbyView() {
   ];
   const posJug1 = 0;
   const posJug2 = 1;
-  const [isChecked, setChecked] = useState(false); //For private rooms
   const onSearchRoom = ()=>
   {
     console.log("Buscar");
@@ -29,17 +32,26 @@ export default function LobbyView() {
     console.log("Crear room");
   }
   
-  const onChooseRoom = ()=>
-  {
+  const onChooseRoom = async () => {
     console.log("Elegir room");
+    placeholderRoom.user2 = placeholderJugadores[0];
+    console.log("Esperando retador...");
+    setIsLoading(true);
+    
+    // Simulate waiting for another player
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    setIsLoading(false);
+    console.log("¡Enemigo encontrado!");
+    placeholderRoom.user2 = placeholderJugadores[1];
+    navigation.navigate("/game", {placeholderRoom});
   }
 
   const onPlayRandom = ()=>
   {
     console.log("Jugar partida random");
   }
-
-
+  
   return (
     <View style={styles.container}>
       <View style={styles.lobby}>
@@ -65,18 +77,21 @@ export default function LobbyView() {
               <Button cb={onSearchRoom}>Buscar</Button>
             </View>
             <View style={styles.displayListRooms}>
-              <Room isPlaying={placeholderRoom.isPlaying} user1={placeholderRoom.user1} user2={placeholderRoom.user2} selectRoom={()=>onChooseRoom()}></Room>
+              <Room isPlaying={placeholderRoom.isPlaying} user1={placeholderRoom.user1} user2={placeholderRoom.user2} selectRoom={onChooseRoom}></Room>
             </View>
             <View style={styles.containerHorizontalContent}>
               <Text style={[styles.whiteText, styles.textInfo]}>Nombre de la nueva sala</Text>
               <TextInput style={styles.inputTxt}></TextInput>   
-              <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} />
-              <Text style={[styles.whiteText, styles.textInfo]}>Privado</Text>
+              <View style={{flexDirection: "column", alignItems: "center"}}>
+                <Text style={[styles.whiteText, styles.textInfo]}>Privado</Text>
+                <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} />
+              </View>
               <Button cb={onCreateRoom}>Crear sala</Button>
             </View>
           </View>
         </View>
       </View>
+      <LoadingScreen isLoading={isLoading} text="Esperando al otro retador"></LoadingScreen>
     </View>
   );
 }
