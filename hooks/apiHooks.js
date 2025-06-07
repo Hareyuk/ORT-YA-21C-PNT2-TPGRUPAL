@@ -17,7 +17,7 @@ const ApiHooksContext = createContext(
   }
 );
 
-export function apiHooksProvider({ children }) {
+export function ApiHooksProvider({ children }) {
   const apiBase = Config.API_URL;
   const apiUsers = Config.API_USERS;
   const apiRooms = Config.API_CARDS;
@@ -283,7 +283,7 @@ export function useApiHooks()
 {
     const context = useContext(ApiHooksContext);
     if (!context) {
-      throw new Error("ApiHooksContext must be used within ApiHooksContextProvider");
+      throw new Error("ApiHooksContext must be used within apiHooksProvider");
   }
     return context;
 }
