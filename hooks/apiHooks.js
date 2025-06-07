@@ -1,4 +1,5 @@
 import { useContext, createContext } from "react";
+import {API_URL, API_CARDS, API_GAME, API_USERS} from '@env'
 const ApiHooksContext = createContext(
   {
     //API ROOMS
@@ -19,12 +20,11 @@ const ApiHooksContext = createContext(
 );
 
 export function ApiHooksProvider({ children }) {
-  const apiBase = process.env.API_URL;
-  const apiUsers = process.env.API_USERS;
-  const apiRooms = process.env.API_CARDS;
-  const apiCards = process.env.API_GAME;
+  const apiBase = API_URL;
+  const apiUsers = API_USERS;
+  const apiRooms = API_CARDS;
+  const apiCards = API_GAME;
   
-
   const apiJoinRoom = async (id, user)=>
   {
     let responseOk = true;
