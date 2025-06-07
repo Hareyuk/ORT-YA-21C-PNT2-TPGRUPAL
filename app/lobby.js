@@ -35,7 +35,7 @@ export default function LobbyView() {
   const onChooseRoom = async () => {
     console.log("Elegir room");
     placeholderRoom.user2 = placeholderJugadores[0];
-    console.log("Esperando retador...");
+    console.log("Conectándose a la sala...");
     setIsLoading(true);
     
     // Simulate waiting for another player
