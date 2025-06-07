@@ -1,267 +1,133 @@
 import { useContext, createContext } from "react";
-import {API_URL, API_CARDS, API_GAME, API_USERS} from '@env'
-const ApiHooksContext = createContext(
-  {
-    //API ROOMS
-    apiJoinRoom: ()=>{},
-    apiSendSelectedOrderCards: ()=>{},
-    apiPlayRound: ()=>{},
-    apiPlayNextRound: ()=>{},
-    apiGetRoom: ()=>{},
-    //API USERS
-    apiGetUserById: ()=>{},
-    apiGetUsers: ()=>{},
-    apiPostLoginuser: ()=>{},
-    apiPostCreateUser: ()=>{},
-    apiPutUpdateUser: ()=>{},
-    apiDeleteUser: ()=>{},
-    //API CARDS
-  }
-);
+import { API_URL, API_CARDS, API_GAME, API_USERS } from '@env';
+
+const ApiHooksContext = createContext({
+  //API ROOMS
+  apiJoinRoom: () => {},
+  apiSendSelectedOrderCards: () => {},
+  apiPlayRound: () => {},
+  apiPlayNextRound: () => {},
+  apiGetRoom: () => {},
+  //API USERS
+  apiGetUserById: () => {},
+  apiGetUsers: () => {},
+  apiPostLoginuser: () => {},
+  apiPostCreateUser: () => {},
+  apiPutUpdateUser: () => {},
+  apiDeleteUser: () => {},
+  //API CARDS
+});
 
 export function ApiHooksProvider({ children }) {
   const apiBase = API_URL;
   const apiUsers = API_USERS;
   const apiRooms = API_CARDS;
   const apiCards = API_GAME;
-  
-  const apiJoinRoom = async (id, user)=>
-  {
+
+
+  let responseOk = true;
+  const apiUrl = apiBase + apiUsers;
+
+  // Helper for POST/PUT requests with JSON body
+  const fetchJson = async (url, method, bodyObj) => {
     let responseOk = true;
-    const apiUrl = apiBase + apiRooms + "/unirse";
-    try
-    {
-      await fetch(apiUrl,
-        {
-          method: 'POST',
-          body:
-          {
-            id: id,
-            usuario: user
-          }
-        }
-      )
-    }
-    catch(e)
-    {
+    try {
+      const res = await fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(bodyObj),
+      });
+      if (!res.ok) {
+        responseOk = false;
+        const errorData = await res.text();
+        console.error('Server error:', {
+          status: errorData.status,
+          statusText: errorData.statusText,
+          error: errorData
+        });
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      else
+      {
+        const data = await res.json();
+        console.log('Success response:', data);
+      }
+      return responseOk;
+    } catch (e) {
       responseOk = false;
-      throw new Error("ERROR: ", e);
+      throw new Error("ERROR: " + e.message);
     }
-    return responseOk;
-  }
+  };
 
-  const apiSendSelectedOrderCards = async (id, orderCards)=>
-  {
-    let responseOk = true;
-    const apiUrl = apiBase + apiRooms + "/ordenar";
-    try
-    {
-      await fetch(apiUrl,
-        {
-          method: 'POST',
-          body:
-          {
-            id: id,
-            nuevoOrden: orderCards
-          }
-        }
-      )
+  // Helper for GET requests
+  const fetchGet = async (url) => {
+    try {
+      const res = await fetch(url, { method: 'GET' });
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+      return res;
+    } catch (e) {
+      throw new Error("ERROR: " + e.message);
     }
-    catch(e)
-    {
-      responseOk = false;
-      throw new Error("ERROR: ", e);
-    }
-    return responseOk;
-  }
+  };
 
-  const apiPlayRound = async ()=>
-  {
-    let responseOk = true;
-    const apiUrl = apiBase + apiRooms + "/jugar";
-    try
-    {
-      await fetch(apiUrl,
-        {
-          method: 'POST',
-          body: {}
-        }
-      )
-    }
-    catch(e)
-    {
-      responseOk = false;
-      throw new Error("ERROR: ", e);
-    }
-    return responseOk;
-  }
+  // API ROOMS
+  const apiJoinRoom = async (id, user) => {
+    return fetchJson(apiBase + apiRooms + "/unirse", 'POST', {
+      id,
+      usuario: user,
+    });
+  };
 
-  const apiPlayNextRound = async ()=>
-  {
-    let responseOk = true;
-    const apiUrl = apiBase + apiRooms + "/siguiente";
-    try
-    {
-      await fetch(apiUrl,
-        {
-          method: 'POST',
-          body: {}
-        }
-      )
-    }
-    catch(e)
-    {
-      responseOk = false;
-      throw new Error("ERROR: ", e);
-    }
-    return responseOk;
-  }
+  const apiSendSelectedOrderCards = async (id, orderCards) => {
+    return fetchJson(apiBase + apiRooms + "/ordenar", 'POST', {
+      id,
+      nuevoOrden: orderCards,
+    });
+  };
 
-  const apiGetRoom = async ()=>
-  {
-    let responseOk = false;
-    const apiUrl = apiBase + apiRooms + "/sala";
-    try
-    {
-      responseOk = await fetch(apiUrl,
-        {
-          method: 'GET'
-        }
-      )
-    }
-    catch(e)
-    {
-      throw new Error("ERROR: ", e);
-    }
-    return responseOk;
-  }
+  const apiPlayRound = async () => {
+    return fetchJson(apiBase + apiRooms + "/jugar", 'POST', {});
+  };
 
-  const apiGetUserById = async (id)=>
-  {
-    let responseOk = false;
-    const apiUrl = apiBase + apiUsers + `/${id}`;
-    try
-    {
-      responseOk = await fetch(apiUrl,
-        {
-          method: 'GET'
-        }
-      )
-    }
-    catch(e)
-    {
-      throw new Error("ERROR: ", e);
-    }
-    return responseOk;
-  }
+  const apiPlayNextRound = async () => {
+    return fetchJson(apiBase + apiRooms + "/siguiente", 'POST', {});
+  };
 
-  const apiGetUsers = async ()=>
-  {
-    let responseOk = false;
-    const apiUrl = apiBase + apiUsers;
-    try
-    {
-      responseOk = await fetch(apiUrl,
-        {
-          method: 'GET'
-        }
-      )
-    }
-    catch(e)
-    {
-      throw new Error("ERROR: ", e);
-    }
-    return responseOk;
-  }
+  const apiGetRoom = async () => {
+    return fetchGet(apiBase + apiRooms + "/sala");
+  };
 
-  const apiPostLoginuser = async (user, pass)=>
-  {
-    let responseOk = false;
-    const apiUrl = apiBase + apiUsers + `/login`;
-    try
-    {
-      responseOk = await fetch(apiUrl,
-        {
-          method: 'POST',
-          body: {
-            usuarioIngresado: user,
-            contraseniaIngresada: pass
-          }
-        }
-      )
-    }
-    catch(e)
-    {
-      throw new Error("ERROR: ", e);
-    }
-    return responseOk;
-  }
+  // API USERS
+  const apiGetUserById = async (id) => {
+    return fetchGet(apiBase + apiUsers + `/${id}`);
+  };
 
-  const apiPostCreateUser = async (formData)=>
-  {
-    let responseOk = true;
-    const apiUrl = apiBase + apiUsers;
-    console.log("Api url de crear usuario: " + apiUrl);
-    
-    try
-    {
-      await fetch(apiUrl,
-        {
-          method: 'POST',
-          body: formData
-        }
-      )
-    }
-    catch(e)
-    {
-      responseOk = false;
-      throw new Error("ERROR: ", e);
-    }
-    return responseOk;
-  }
+  const apiGetUsers = async () => {
+    return fetchGet(apiBase + apiUsers);
+  };
 
-  const apiPutUpdateUser = async (id, formData)=>
-  {
-    let responseOk = true;
-    const apiUrl = apiBase + apiUsers + `/${id}`;
-    try
-    {
-      await fetch(apiUrl,
-        {
-          method: 'POST',
-          body: formData
-        }
-      )
-    }
-    catch(e)
-    {
-      responseOk = false;
-      throw new Error("ERROR: ", e);
-    }
-    return responseOk;
-  }
+  const apiPostLoginuser = async (user, pass) => {
+    return fetchJson(apiBase + apiUsers + `/login`, 'POST', {
+      usuarioIngresado: user,
+      contraseniaIngresada: pass,
+    });
+  };
 
-  const apiDeleteUser = async (id)=>
-  {
-    let responseOk = true;
-    const apiUrl = apiBase + apiUsers + `/${id}`;
-    try
-    {
-      await fetch(apiUrl,
-        {
-          method: 'POST',
-          body: {}
-        }
-      )
-    }
-    catch(e)
-    {
-      responseOk = false;
-      throw new Error("ERROR: ", e);
-    }
-    return responseOk;
-  }
-  
+  const apiPostCreateUser = async (formData) => {
+    return fetchJson(apiBase + apiUsers, 'POST', formData);
+  };
+
+  const apiPutUpdateUser = async (id, formData) => {
+    return fetchJson(apiBase + apiUsers + `/${id}`, 'PUT', formData);
+  };
+
+  const apiDeleteUser = async (id) => {
+    return fetchJson(apiBase + apiUsers + `/${id}`, 'DELETE', {});
+  };
+
   const value = {
     //API ROOMS
     apiJoinRoom,
@@ -284,13 +150,12 @@ export function ApiHooksProvider({ children }) {
       {children}
     </ApiHooksContext.Provider>
   );
-};
+}
 
-export function useApiHooks()
-{
-    const context = useContext(ApiHooksContext);
-    if (!context) {
-      throw new Error("ApiHooksContext must be used within apiHooksProvider");
+export function useApiHooks() {
+  const context = useContext(ApiHooksContext);
+  if (!context) {
+    throw new Error("ApiHooksContext must be used within apiHooksProvider");
   }
-    return context;
+  return context;
 }
