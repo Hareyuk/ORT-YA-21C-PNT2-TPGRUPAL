@@ -3,17 +3,20 @@ import Config from 'react-native-config';
 
 const ApiHooksContext = createContext(
   {
+    //API ROOMS
     apiJoinRoom: ()=>{},
     apiSendSelectedOrderCards: ()=>{},
     apiPlayRound: ()=>{},
     apiPlayNextRound: ()=>{},
     apiGetRoom: ()=>{},
+    //API USERS
     apiGetUserById: ()=>{},
     apiGetUsers: ()=>{},
     apiPostLoginuser: ()=>{},
     apiPostCreateUser: ()=>{},
     apiPutUpdateUser: ()=>{},
-    apiDeleteUser: ()=>{}
+    apiDeleteUser: ()=>{},
+    //API CARDS
   }
 );
 
@@ -259,17 +262,20 @@ export function ApiHooksProvider({ children }) {
   }
   
   const value = {
+    //API ROOMS
     apiJoinRoom,
     apiSendSelectedOrderCards,
     apiPlayRound,
     apiPlayNextRound,
     apiGetRoom,
+    //API USERS
     apiGetUserById,
     apiGetUsers,
     apiPostLoginuser,
     apiPostCreateUser,
     apiPutUpdateUser,
     apiDeleteUser,
+    //API CARDS
   };
 
   return (

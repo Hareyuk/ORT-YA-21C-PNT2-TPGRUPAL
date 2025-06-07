@@ -1,5 +1,5 @@
 import { useContext, useState, createContext } from "react";
-
+import { useApiHooks } from "./apiHooks";
 const UserLoggedStatusContext = createContext(
   {
     isUserLogged: false,
@@ -11,11 +11,16 @@ const UserLoggedStatusContext = createContext(
 
 export function UserLoggedStatusProvider({ children }) {
   const [isUserLogged, setIsUserLogged] = useState(false);
-  const [dataUser, setDataUser] = useState();
-  const logInUser = (data) => {
+  const [tokenUser, setTokenUser] = useState(null);
+
+  const { apiPostLoginuser } = useApiHooks();
+
+  const logInUser = async (data) => {
     //Request user login here
-    console.log("Usuario logeado: ", data);
-    
+    const {user, pass} = data;
+    const dataUser = await apiPostLoginuser(user, pass);
+    if(dataUser) setTokenUser(dataUser)
+    else return null;
     setIsUserLogged(true);
   }
   const logOutUser = () => {
@@ -28,7 +33,7 @@ export function UserLoggedStatusProvider({ children }) {
     isUserLogged,
     logInUser,
     logOutUser,
-    dataUser
+    dataUser: tokenUser
   };
 
   return (

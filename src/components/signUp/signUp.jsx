@@ -9,6 +9,7 @@ import {
   Image,
 } from "react-native";
 import estilos from "./estiloSignUp";
+import { useApiHooks } from "../../../hooks/apiHooks";
 
 export default function SignUp() {
   const [usuario, setUsuario] = useState("");
@@ -17,16 +18,25 @@ export default function SignUp() {
   const [fechaNacimiento, setFechaNacimiento] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [confirmarContrasena, setConfirmarContrasena] = useState("");
+  
+  const { apiPostCreateUser } = useApiHooks();
 
-  const crearCuenta = () => {
-    console.log("Datos:", {
+  const crearCuenta = async () => {
+    //Validar
+
+
+    const data = {
       usuario,
       email,
-      confirmarEmail,
       fechaNacimiento,
       contrasena,
-      confirmarContrasena,
-    });
+    };
+    console.log("Datos de registro:", data);
+    const creacionOk = await apiPostCreateUser(data);
+    if(!creacionOk)
+    {
+      //Error notificacion al registrarse
+    }
   };
 
   return (
