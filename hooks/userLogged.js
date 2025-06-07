@@ -20,7 +20,11 @@ export function UserLoggedStatusProvider({ children }) {
     const {user, pass} = data;
     const dataUser = await apiPostLoginuser(user, pass);
     if(dataUser) setTokenUser(dataUser)
-    else return null;
+    else
+    {
+      //Error notificacion
+      return null;
+    }
     setIsUserLogged(true);
   }
   const logOutUser = () => {

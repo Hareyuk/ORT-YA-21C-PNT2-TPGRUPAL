@@ -26,10 +26,10 @@ export default function SignUp() {
 
 
     const data = {
-      usuario,
-      email,
-      fechaNacimiento,
-      contrasena,
+      usuario: usuario,
+      email: email,
+      fechaNac: fechaNacimiento,
+      contrasenia: contrasena,
     };
     console.log("Datos de registro:", data);
     const creacionOk = await apiPostCreateUser(data);

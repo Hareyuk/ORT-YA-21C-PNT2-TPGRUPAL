@@ -1,6 +1,4 @@
 import { useContext, createContext } from "react";
-import Config from 'react-native-config';
-
 const ApiHooksContext = createContext(
   {
     //API ROOMS
@@ -21,10 +19,11 @@ const ApiHooksContext = createContext(
 );
 
 export function ApiHooksProvider({ children }) {
-  const apiBase = Config.API_URL;
-  const apiUsers = Config.API_USERS;
-  const apiRooms = Config.API_CARDS;
-  const apiCards = Config.API_GAME;
+  const apiBase = process.env.API_URL;
+  const apiUsers = process.env.API_USERS;
+  const apiRooms = process.env.API_CARDS;
+  const apiCards = process.env.API_GAME;
+  
 
   const apiJoinRoom = async (id, user)=>
   {
@@ -201,7 +200,9 @@ export function ApiHooksProvider({ children }) {
   const apiPostCreateUser = async (formData)=>
   {
     let responseOk = true;
-    const apiUrl = apiBase + apiUsers + `/`;
+    const apiUrl = apiBase + apiUsers;
+    console.log("Api url de crear usuario: " + apiUrl);
+    
     try
     {
       await fetch(apiUrl,
