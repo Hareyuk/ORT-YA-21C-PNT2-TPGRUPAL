@@ -4,7 +4,6 @@ export default function Footer() {
 return (
     <View style={styles.footer}>
         <View style={styles.containerFooter}>
-            <Text style={[styles.whiteText, styles.logoFooter]}>Logo</Text>
             <Text style={styles.whiteText}>©Axel Dumas, Martín Palma y Dylan Sosa Domecq - 2025</Text>
         </View>
     </View>
@@ -16,6 +15,7 @@ const styles = StyleSheet.create({
   footer:
     {
         width: "100%",
+        height: "5%",
         backgroundColor: "#3a2a23",
         paddingVertical: "1em"
     },

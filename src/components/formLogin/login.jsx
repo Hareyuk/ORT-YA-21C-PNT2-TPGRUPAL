@@ -16,9 +16,27 @@ export default function Login() {
   const [contrasena, setContrasena] = useState("");
   const { logInUser } = useAuthUser();
 
-  const iniciarSesion = ()=>
+  const iniciarSesion = async ()=>
     {
-        logInUser({usuario,contrasena,});
+        const validacion = true; //Aquí llama a la función que valida
+        if(validacion)
+        {
+          try
+          {
+            const data = { usuario: usuario, contrasenia: contrasena}
+            await logInUser(data);
+            //Notificador de que se inició sesión correctamente y vaya a home después de los seteos
+          }
+          catch(e)
+          {
+            //Error notificador de que algo salió mal e intente de nuevo
+          }
+        }
+        else
+        {
+          //Error notificación formulario
+          //Mostrar requisitos a completar de form
+        }
     };
 
   return (
@@ -28,7 +46,6 @@ export default function Login() {
           source={require("../../../assets/icon.png")}
           style={estilos.logo}
         />
-        <Text style={estilos.tituloPrincipal}>Zoro Defenders TCG</Text>
       </View>
 
       <Text style={estilos.subtitulo}>Iniciar sesión</Text>
@@ -42,6 +59,7 @@ export default function Login() {
       <TextInput
         style={estilos.input}
         placeholder="Contraseña"
+        type="password"
         value={contrasena}
         onChangeText={setContrasena}
         secureTextEntry
@@ -57,7 +75,8 @@ export default function Login() {
         </Text>
       </TouchableOpacity>
 
-      <Text style={estilos.copyright}>© 2025 - Nombres de integrantes</Text>
+    
+      <Text style={estilos.copyright}>© 2025 - Axel Dumas, Martín Palma Sabino y Dylan Sosa Domecq</Text>
     </ScrollView>
   );
 }

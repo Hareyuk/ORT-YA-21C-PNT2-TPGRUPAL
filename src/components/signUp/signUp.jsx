@@ -32,10 +32,21 @@ export default function SignUp() {
       contrasenia: contrasena,
     };
     console.log("Datos de registro:", data);
-    const creacionOk = await apiPostCreateUser(data);
-    if(!creacionOk)
+    const validarForm = true; //Aquí iría la función que valida los campos
+    if(validarForm)
     {
       //Error notificacion al registrarse
+    }
+
+    try
+    {
+      const responseOk = await apiPostCreateUser(data);
+      //Todo OK, mandar a inicio con notificación de registro correcto  
+    }
+    catch(e)
+    {
+      //Prevenir error
+      //Notificación de que hubo un error
     }
   };
 
@@ -46,7 +57,6 @@ export default function SignUp() {
           source={require("../../../assets/icon.png")}
           style={estilos.logo}
         />
-        <Text style={estilos.tituloPrincipal}>Zoro Defenders TCG</Text>
       </View>
 
       <Text style={estilos.subtitulo}>Crear cuenta</Text>
@@ -104,7 +114,7 @@ export default function SignUp() {
         </Text>
       </TouchableOpacity>
 
-      <Text style={estilos.copyright}>© 2025 - Nombres de integrantes</Text>
+      <Text style={estilos.copyright}>© 2025 - Axel Dumas, Martín Palma Sabino y Dylan Sosa Domecq</Text>
     </ScrollView>
   );
 }

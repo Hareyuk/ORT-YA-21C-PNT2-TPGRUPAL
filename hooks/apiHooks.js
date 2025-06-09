@@ -109,11 +109,8 @@ export function ApiHooksProvider({ children }) {
     return fetchGet(apiBase + apiUsers);
   };
 
-  const apiPostLoginuser = async (user, pass) => {
-    return fetchJson(apiBase + apiUsers + `/login`, 'POST', {
-      usuarioIngresado: user,
-      contraseniaIngresada: pass,
-    });
+  const apiPostLoginuser = async (formData) => {
+    return fetchJson(apiBase + apiUsers + `/login`, 'POST', formData);
   };
 
   const apiPostCreateUser = async (formData) => {

@@ -24,5 +24,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column-reverse',
     backgroundColor: '#2e2e2e', 
+    justifyContent: "flex-end"
   },
 });

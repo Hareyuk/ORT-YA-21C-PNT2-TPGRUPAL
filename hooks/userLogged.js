@@ -17,15 +17,18 @@ export function UserLoggedStatusProvider({ children }) {
 
   const logInUser = async (data) => {
     //Request user login here
-    const {user, pass} = data;
-    const dataUser = await apiPostLoginuser(user, pass);
-    if(dataUser) setTokenUser(dataUser)
+    let responseOk = true;
+    const dataUser = await apiPostLoginuser(data);
+    if(dataUser) {
+      setTokenUser(dataUser)
+      setIsUserLogged(true);
+    }
     else
     {
+      responseOk = false;
       //Error notificacion
-      return null;
     }
-    setIsUserLogged(true);
+    return responseOk;
   }
   const logOutUser = () => {
     //Close
