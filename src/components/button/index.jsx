@@ -1,21 +1,13 @@
 import { Link } from "expo-router";
-import { ImageBackground, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ImageBackground, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const Button = ({ href, children, cb }) => {
+const Button = ({ children, cb }) => {
   return (
-    href != null 
-    ?
-    <Link href={href} style={[styles.generalButton]}>
+    <Pressable style={[styles.generalButton]} onPress={cb}>
         <ImageBackground source={require('../../../assets/img/ui_button.png')} style={styles.img_ui}>       
             <Text style={[styles.txtButton]}>{children}</Text>
         </ImageBackground>
-    </Link>
-    :
-    <TouchableOpacity style={[styles.generalButton]} onPress={cb}>
-        <ImageBackground source={require('../../../assets/img/ui_button.png')} style={styles.img_ui}>       
-            <Text style={[styles.txtButton]}>{children}</Text>
-        </ImageBackground>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -23,8 +15,8 @@ const styles = StyleSheet.create({
   generalButton:
   {
     backgroundColor: "transparent",
-    paddingVertical: "1em",
-    paddingHorizontal: "2em",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
     aspectRatio: "4.19/1",
     textAlign: "center",
     justifyContent: "center",
@@ -43,13 +35,13 @@ const styles = StyleSheet.create({
   txtButton:
   {
     fontWeight: "bold",
-    fontSize: "1.2em",
+    fontSize: 19,
     textAlign: "center",
   },
   smaller:
   {
     width: "200px",
-    fontSize: "0.9em"
+    fontSize: 14
   }
 });
 

@@ -17,17 +17,17 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "5%",
         backgroundColor: "#3a2a23",
-        paddingVertical: "1em"
+        paddingVertical: 16
     },
     containerFooter:
     {
         display: "flex",
-        paddingHorizontal: "1em",
+        paddingHorizontal: 16,
         maxWidth: "1920px",
         flexDirection: "column",
         justifyContent: "center",
         alignContent: "center",
-        gap: "1em",
+        gap: 16,
         textAlign: "center"
     },
     whiteText: {

@@ -1,9 +1,10 @@
 import { Link, withLayoutContext } from "expo-router";
-import { View, Text, StyleSheet, Button, Platform } from "react-native";
+import { View, Text, StyleSheet, Button, Platform, Pressable } from "react-native";
 import Entypo from '@expo/vector-icons/Entypo';
 import { useState } from "react";
 import styled from "styled-components/native";
 import { useAuthUser } from "../../../hooks/userLogged";
+import { useNavigation } from "@react-navigation/native";
 
 const MenuNav = styled.View`
         z-index: 15;
@@ -21,6 +22,7 @@ const MenuNav = styled.View`
         `;
 
 export default function Header() {
+    const navigation = useNavigation();
     //Obtener datos del context
     const { isUserLogged, logOutUser } = useAuthUser();
     
@@ -30,10 +32,15 @@ export default function Header() {
     const [posXMenu, setPosXMenu] = useState(posXInactive);
     const toggleMenu = () => { posXMenu === posXActive ? setPosXMenu(posXInactive) : setPosXMenu(posXActive) }
     
+    const handleNavigation = (route) => {
+        toggleMenu();
+        navigation.navigate(route);
+    };
+    
     const cerrarSesion = ()=>
     {
         logOutUser();
-        toggleMenu();
+        handleNavigation('Home')
     }
     
     return (
@@ -44,24 +51,42 @@ export default function Header() {
             </View>
             <MenuNav posXMenu={posXMenu}>
                 <Entypo name="cross" size={30} color="white" onPress={toggleMenu} />
-                <Text style={[styles.whiteText, styles.menuNavBar]}>
-                    <Link href="/" style={styles.itemLink} onPress={toggleMenu}>Home</Link>
-                     <Link href="/about" style={styles.itemLink} onPress={toggleMenu}>About Us</Link> 
-                    {isUserLogged ?
-                    <>                         
-                        <Link href="/lobby" style={styles.itemLink} onPress={toggleMenu}>Lobby</Link>
-                        <Link href="/game" style={styles.itemLink} onPress={toggleMenu}>Juego</Link>
-                        <Link href="/profile" style={styles.itemLink} onPress={toggleMenu}>Perfil</Link>
-                        <Link href="/editProfile" style={styles.itemLink} onPress={toggleMenu}>Editar perfil</Link>
-                        <Link href="/" style={styles.itemLink} onPress={cerrarSesion}>Cerrar sesión</Link>
-                    </>
-                    :
-                    <>
-                        <Link href="/login" style={styles.itemLink} onPress={toggleMenu}>Login</Link>
-                        <Link href="/signup" style={styles.itemLink} onPress={toggleMenu}>Registro</Link>
-                    </>
-                    }
-                </Text>
+                <View style={[styles.menuNavBar]}>
+                    <Pressable onPress={() => handleNavigation('Home')}>
+                        <Text style={[styles.whiteText, styles.itemLink]}>Home</Text>
+                    </Pressable>
+                   {isUserLogged ? (
+                        <>                         
+                            <Pressable onPress={() => handleNavigation('Lobby')}>
+                                <Text style={[styles.whiteText, styles.itemLink]}>Lobby</Text>
+                            </Pressable>
+                            <Pressable onPress={() => handleNavigation('Game')}>
+                                <Text style={[styles.whiteText, styles.itemLink]}>Juego</Text>
+                            </Pressable>
+                            <Pressable onPress={() => handleNavigation('Profile')}>
+                                <Text style={[styles.whiteText, styles.itemLink]}>Perfil</Text>
+                            </Pressable>
+                            <Pressable onPress={() => handleNavigation('EditProfile')}>
+                                <Text style={[styles.whiteText, styles.itemLink]}>Editar perfil</Text>
+                            </Pressable>
+                            <Pressable onPress={cerrarSesion}>
+                                <Text style={[styles.whiteText, styles.itemLink]}>Cerrar sesión</Text>
+                            </Pressable>
+                        </>
+                    ) : (
+                        <>
+                            <Pressable onPress={() => handleNavigation('Login')}>
+                                <Text style={[styles.whiteText, styles.itemLink]}>Login</Text>
+                            </Pressable>
+                            <Pressable onPress={() => handleNavigation('SignUp')}>
+                                <Text style={[styles.whiteText, styles.itemLink]}>Registrarse</Text>
+                            </Pressable>
+                        </>
+                    )}
+                    <Pressable onPress={() => handleNavigation('About')}>
+                        <Text style={[styles.whiteText, styles.itemLink]}>About Us</Text>
+                    </Pressable>
+                </View>
             </MenuNav>
         </View>
     );
@@ -86,7 +111,7 @@ export default function Header() {
         },
         buttonOutsideHeader: {
             position: "absolute",
-            right: "1em",
+            right: 16,
         },
         logoHeader: {
             fontSize: 24,

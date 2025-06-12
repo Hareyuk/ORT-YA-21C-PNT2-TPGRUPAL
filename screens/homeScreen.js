@@ -3,26 +3,36 @@ import { Link } from "expo-router";
 import Button from "../src/components/button";
 import { withTheme } from "styled-components";
 import { useAuthUser } from "../hooks/userLogged";
+import { useNavigation } from "@react-navigation/native";
 
-export default function Page() {
+export default function Home() {
 
+    const navigation = useNavigation();
     const { isUserLogged } = useAuthUser();
 
   const cardPreviews = [{
+    id:"1",
     text: "piedra",
     src: require("../assets/img/card_preview_1.jpg")
   },
   {
+    id:"2",
     text: "tijeras",
     src: require("../assets/img/card_preview_2.jpg")
   },
   {
+    id:"3",
     text: "papel",
     src: require("../assets/img/card_preview_3.jpg")
   }];
-  const previewCardHTML = (text, src)=>{
+
+  const handleNavigation = (route) => {
+        navigation.navigate(route);
+    };
+    
+  const previewCardHTML = (id, text, src)=>{
     return(
-    <View style={styles.containerCardPreview}>
+    <View style={styles.containerCardPreview} key={id}>
         <Image
           style={styles.cardPreview}
           source={src}
@@ -31,6 +41,7 @@ export default function Page() {
       </View>
       );
   }
+  
   return (
     <View style={styles.container}>
       <ScrollView style={styles.main} centerContent={true} contentContainerStyle={{ flexGrow: 1 }}>
@@ -41,16 +52,16 @@ export default function Page() {
                 isUserLogged
                 ?
                 <>
-                  <Button href='/lobby'>
+                  <Button cb={()=>handleNavigation('Lobby')}>
                     Ingresar al lobby
                   </Button>
                 </>
                 :
                 <>
-                  <Button href='/signup'>
+                  <Button cb={()=>handleNavigation('SignUp')}>
                     Registrarse
                   </Button>
-                  <Button href='/login'>
+                  <Button cb={()=>handleNavigation('Login')}>
                     Iniciar sesión
                   </Button>
                 </>
@@ -60,7 +71,7 @@ export default function Page() {
         </View>
         <View style={styles.sectionCards}>
           <View style={styles.containerPvCards}>
-            {cardPreviews.map((item)=>previewCardHTML(item.text, item.src))}
+            {cardPreviews.map((item)=>previewCardHTML(item.id, item.text, item.src))}
           </View>
           <View style={styles.containerPvText}>
             <Text style={styles.title}>Desafía tu estrategia en el duelo definitivo de cartas</Text>
@@ -95,7 +106,7 @@ const styles = StyleSheet.create({
     objectFit: 'contain',
     height: '100%',
     justifyContent: "flex-end",
-    paddingBottom: "1em",
+    paddingBottom: 16,
   },
   w100:
   {
@@ -104,8 +115,8 @@ const styles = StyleSheet.create({
   generalButton:
   {
     backgroundColor: "#f3eb9e",
-    paddingVertical: "1em",
-    paddingHorizontal: "2em",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
   },
   landingContainerBtns:
   {
@@ -113,7 +124,7 @@ const styles = StyleSheet.create({
     flexWrap: "nowrap",
     justifyContent: "flex-end",
     alignItems: "center",
-    gap: "1em",
+    gap: 16,
   },
   sectionCards:
   {
@@ -122,18 +133,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignContent: "center",
     justifyContent: "center",
-    padding: "2em",
+    padding: 32,
     alignItems: "center",
   },
   title:
   {
     color: "#fae99e",
-    fontSize: "1.8em",
+    fontSize: 29,
   },
   subtitle:
   {
     color: "#fff",
-    fontSize: "1.2em"
+    fontSize: 19
   },
   containerPvCards:
   {
@@ -165,7 +176,7 @@ const styles = StyleSheet.create({
   {
     color: "#fff",
     textAlign: "center",
-    fontSize: "1.4em",
-    marginVertical: "1em"
+    fontSize: 22,
+    marginVertical: 16
   }
 });

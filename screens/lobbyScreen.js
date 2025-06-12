@@ -4,9 +4,11 @@ import Checkbox from 'expo-checkbox';
 import { useState, useEffect } from "react";
 import Room from "../src/components/room/room";
 import LoadingScreen from "../src/components/loading/loading";
-import { navigate } from "expo-router/build/global-state/routing";
+import { useNavigation } from "@react-navigation/native";
 
 export default function LobbyView() {
+  const navigation = useNavigation();
+
   const [isLoading, setIsLoading] = useState(false);
   const [isChecked, setChecked] = useState(false); //For private rooms
   let placeholderRoom =
@@ -101,7 +103,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    paddingVertical: "1.5em",
+    paddingVertical: 24,
     backgroundColor: "#130e0c",
   },
   lobby: {
@@ -111,15 +113,15 @@ const styles = StyleSheet.create({
     marginHorizontal: "auto",
     flexDirection: "row",
     width: "80%",
-    gap: "1em",
+    gap: 16,
   },
   userInfo:
   {
     width: "40%",
     flexDirection: "column",
     backgroundColor: "#3a2a23",
-    padding: "1.5em",
-    borderRadius: "1em",
+    padding: 24,
+    borderRadius: 16,
     height: "fit-content",
     textAlign: "center",
     alignItems: "center",
@@ -131,16 +133,16 @@ const styles = StyleSheet.create({
     width: "60%",
     flexDirection: "column",
     backgroundColor: "#3a2a23",
-    padding: "1.5em",
-    borderRadius: "1em",
+    padding: 24,
+    borderRadius: 16,
     height: "fit-content"
   },
   displayListRooms:
   {
     backgroundColor: "#1f1714bb",
-    padding: "1.5em",
-    borderRadius: "1em",
-    marginVertical: "1.5em"
+    padding: 24,
+    borderRadius: 16,
+    marginVertical: 24
   },
   personalInfo:
   {
@@ -159,7 +161,7 @@ const styles = StyleSheet.create({
   containerHorizontalContent:
   {
     flexDirection: "row",
-    gap: "1em",
+    gap: 16,
     alignItems: "center"
   }
   ,
@@ -169,19 +171,19 @@ const styles = StyleSheet.create({
   },
   bigText:
   {
-    fontSize: "1.75em",
+    fontSize: 28,
   },
   textInfo:
   {
-    fontSize: "1.15em"
+    fontSize: 18
   },
   inputTxt:
   {
     backgroundColor: "#fff",
-    paddingVertical: "0.4em",
-    paddingHorizontal: "0.25em",
-    borderRadius: "0.35em",
-    marginVertical: "0.5em",
-    fontSize: "1.15em"
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    borderRadius: 6,
+    marginVertical: 8,
+    fontSize: 18
   }
 });
