@@ -8,6 +8,10 @@ import { useNavigation } from "@react-navigation/native";
 export default function Home() {
 
     const navigation = useNavigation();
+    const handleNavigation = (route) => {
+        navigation.navigate(route);
+    };
+
     const { isUserLogged } = useAuthUser();
 
   const cardPreviews = [{
@@ -25,10 +29,6 @@ export default function Home() {
     text: "papel",
     src: require("../assets/img/card_preview_3.jpg")
   }];
-
-  const handleNavigation = (route) => {
-        navigation.navigate(route);
-    };
     
   const previewCardHTML = (id, text, src)=>{
     return(
