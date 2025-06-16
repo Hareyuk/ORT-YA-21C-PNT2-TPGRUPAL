@@ -9,7 +9,7 @@ import {
   Image,
 } from "react-native";
 import estilos from "./estiloSignUp";
-import { useApiHooks } from "../../../hooks/apiHooks";
+import { useApiHooks } from "../../../hooks/apiHooks.js";
 
 export default function SignUp() {
   const [usuario, setUsuario] = useState("");
@@ -33,7 +33,7 @@ export default function SignUp() {
     };
     console.log("Datos de registro:", data);
     const validarForm = true; //Aquí iría la función que valida los campos
-    if(validarForm)
+    if(!validarForm)
     {
       //Error notificacion al registrarse
     }

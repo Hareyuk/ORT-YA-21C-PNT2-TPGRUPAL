@@ -31,6 +31,7 @@ export function ApiHooksProvider({ children }) {
   // Helper for POST/PUT requests with JSON body
   const fetchJson = async (url, method, bodyObj) => {
     let responseOk = true;
+    console.log(`[fetchJson] Intentando ${method} a URL: ${url}`);
     try {
       const res = await fetch(url, {
         method: method,

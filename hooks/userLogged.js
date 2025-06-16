@@ -23,6 +23,7 @@ export function UserLoggedStatusProvider({ children }) {
       setTokenUser(dataUser)
       setIsUserLogged(true);
     }
+    
     else
     {
       responseOk = false;
