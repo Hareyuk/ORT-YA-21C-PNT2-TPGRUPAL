@@ -14,6 +14,7 @@ const UserLoggedStatusContext = createContext(
 );
 
 export function UserLoggedStatusProvider({ children }) {
+  const [userId, setUserId] = useState(null);
   const [isUserLogged, setIsUserLogged] = useState(false);
   const [tokenUser, setTokenUser] = useState(null);
   //const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +25,9 @@ export function UserLoggedStatusProvider({ children }) {
     //Request user login here
     let responseOk = true;
     const dataUser = await apiPostLoginuser(data);
+    const jsonData = await dataUser.json();
     if(dataUser) {
+      console.log("DATOS DE USUARIO LOGEADO: ", jsonData);      
       setTokenUser(dataUser)
       setIsUserLogged(true);
     }
@@ -46,7 +49,8 @@ export function UserLoggedStatusProvider({ children }) {
     isUserLogged,
     logInUser,
     logOutUser,
-    dataUser: tokenUser
+    dataUser: tokenUser,
+    userId: userId
   };
 
   return (
