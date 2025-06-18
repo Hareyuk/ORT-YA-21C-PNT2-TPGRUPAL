@@ -1,17 +1,22 @@
-import { useContext, useState, createContext } from "react";
+import { useContext, useState, createContext, useEffect } from "react";
 import { useApiHooks } from "./apiHooks";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
+
 const UserLoggedStatusContext = createContext(
   {
     isUserLogged: false,
     logInUser: () => {},
     logOutUser: () => {},
-    dataUser: null
+    dataUser: null,
+    //isLoading: true
   }
 );
 
 export function UserLoggedStatusProvider({ children }) {
   const [isUserLogged, setIsUserLogged] = useState(false);
   const [tokenUser, setTokenUser] = useState(null);
+  //const [isLoading, setIsLoading] = useState(true);
 
   const { apiPostLoginuser } = useApiHooks();
 

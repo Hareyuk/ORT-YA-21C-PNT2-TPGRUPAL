@@ -54,19 +54,19 @@ export default function App() {
   
   
   return (
-    <SafeAreaProvider>
-      <ApiHooksProvider>
-        <UserLoggedStatusProvider>
-          <NavigationContainer>
-            <SafeAreaView style={[styles.container, cssStyleWeb]}>
-              <Footer></Footer>
-              <StackNavigation />
-              <Header></Header>
-            </SafeAreaView>
-          </NavigationContainer>
-        </UserLoggedStatusProvider>
-      </ApiHooksProvider>
-    </SafeAreaProvider>
+     <SafeAreaProvider>
+       <ApiHooksProvider>
+         <UserLoggedStatusProvider>
+           <NavigationContainer>
+             <SafeAreaView style={[styles.container, cssStyleWeb]}>
+               <Footer></Footer>
+               <StackNavigation />
+               <Header></Header>
+             </SafeAreaView>
+           </NavigationContainer>
+         </UserLoggedStatusProvider>
+       </ApiHooksProvider>
+     </SafeAreaProvider>
   );
 }
 

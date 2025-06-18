@@ -18,7 +18,7 @@ export default function Login() {
 
   const iniciarSesion = async ()=>
     {
-        const validacion = true; //Aquí llama a la función que valida
+        const validacion = true; 
         if(validacion)
         {
           try
