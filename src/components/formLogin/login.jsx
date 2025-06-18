@@ -10,33 +10,40 @@ import {
 } from "react-native";
 import estilos from "./styles";
 import { useAuthUser } from "../../../hooks/userLogged";
+import LoadingScreen from "../loading/loading";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Login() {
+  const navigation = useNavigation();
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
   const { logInUser } = useAuthUser();
+  const [isLoading, setIsLoading] = useState(false);
 
   const iniciarSesion = async ()=>
     {
-        const validacion = true; //Aquí llama a la función que valida
-        if(validacion)
+      setIsLoading(true)
+      const validacion = true; //Aquí llama a la función que valida
+      if(validacion)
+      {
+        try
         {
-          try
-          {
-            const data = { usuario: usuario, contrasenia: contrasena}
-            await logInUser(data);
-            //Notificador de que se inició sesión correctamente y vaya a home después de los seteos
-          }
-          catch(e)
-          {
-            //Error notificador de que algo salió mal e intente de nuevo
-          }
+          const data = { usuario: usuario, contrasenia: contrasena}
+          await logInUser(data);
+          //Notificador de que se inició sesión correctamente
+          setIsLoading(false);
+          navigation.navigate("Home");
         }
-        else
+        catch(e)
         {
-          //Error notificación formulario
-          //Mostrar requisitos a completar de form
+          //Error notificador de que algo salió mal e intente de nuevo
         }
+      }
+      else
+      {
+        //Error notificación formulario
+        //Mostrar requisitos a completar de form
+      }
     };
 
   return (
@@ -77,6 +84,7 @@ export default function Login() {
 
     
       <Text style={estilos.copyright}>© 2025 - Axel Dumas, Martín Palma Sabino y Dylan Sosa Domecq</Text>
+      <LoadingScreen isLoading={isLoading} text="Esperando al otro retador"></LoadingScreen>
     </ScrollView>
   );
 }

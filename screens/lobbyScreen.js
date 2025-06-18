@@ -46,7 +46,7 @@ export default function LobbyView() {
     setIsLoading(false);
     console.log("¡Enemigo encontrado!");
     placeholderRoom.user2 = placeholderJugadores[1];
-    navigation.navigate("/game", {placeholderRoom});
+    navigation.navigate("Game", {placeholderRoom});
   }
 
   const onPlayRandom = ()=>
