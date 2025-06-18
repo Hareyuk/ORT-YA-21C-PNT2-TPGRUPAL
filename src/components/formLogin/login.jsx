@@ -22,6 +22,8 @@ export default function Login() {
 
   const iniciarSesion = async ()=>
     {
+      try
+      {
         const validacion = true; 
         if(validacion)
         {
@@ -31,17 +33,17 @@ export default function Login() {
           setIsLoading(false);
           navigation.navigate("Home");
         }
-        catch(e)
-        {
-          //Error notificador de que algo salió mal e intente de nuevo
-        }
-      }
       else
       {
         //Error notificación formulario
         //Mostrar requisitos a completar de form
       }
-    };
+      }
+        catch(e)
+        {
+          //Error notificador de que algo salió mal e intente de nuevo
+        }
+      }
 
   return (
     <ScrollView contentContainerStyle={estilos.contenedor}>
@@ -59,6 +61,8 @@ export default function Login() {
         placeholder="Usuario"
         value={usuario}
         onChangeText={setUsuario}
+        textContentType="username"
+        autoComplete="username"
       />
       <TextInput
         style={estilos.input}
@@ -66,6 +70,8 @@ export default function Login() {
         type="password"
         value={contrasena}
         onChangeText={setContrasena}
+        textContentType="password"
+        autoComplete="password"
         secureTextEntry
       />
 
@@ -84,4 +90,4 @@ export default function Login() {
       <LoadingScreen isLoading={isLoading} text="Esperando al otro retador"></LoadingScreen>
     </ScrollView>
   );
-}
+};
