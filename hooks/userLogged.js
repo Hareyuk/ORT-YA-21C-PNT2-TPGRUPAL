@@ -8,34 +8,41 @@ const UserLoggedStatusContext = createContext(
     isUserLogged: false,
     logInUser: () => {},
     logOutUser: () => {},
-    dataUser: null,
+    userData: null,
+    userToken: null
     //isLoading: true
   }
 );
 
 export function UserLoggedStatusProvider({ children }) {
-  const [userId, setUserId] = useState(null);
+  const [userToken, setUserToken] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [isUserLogged, setIsUserLogged] = useState(false);
-  const [tokenUser, setTokenUser] = useState(null);
   //const [isLoading, setIsLoading] = useState(true);
 
-  const { apiPostLoginuser } = useApiHooks();
+  const { apiPostLoginuser, apiGetUserById } = useApiHooks();
 
   const logInUser = async (data) => {
     //Request user login here
     let responseOk = true;
-    const dataUser = await apiPostLoginuser(data);
-    const jsonData = await dataUser.json();
-    if(dataUser) {
-      console.log("DATOS DE USUARIO LOGEADO: ", jsonData);      
-      setTokenUser(dataUser)
-      setIsUserLogged(true);
+    try
+    {
+      const userToken = await apiPostLoginuser(data);    
+      if(userToken) {
+        setUserToken(userToken);
+
+        setUserData(jsonData);
+        setIsUserLogged(true);
+      }
+      else
+      {
+        responseOk = false;
+      }
     }
-    
-    else
+    catch (e)
     {
       responseOk = false;
-      //Error notificacion
+      console.error("ERROR LOGIN: ", e);
     }
     return responseOk;
   }
@@ -43,14 +50,16 @@ export function UserLoggedStatusProvider({ children }) {
     //Close
     console.log("Sesión cerrada");
     setIsUserLogged(false)
+    setUserToken(null);
+    setUserData(null);
   };
 
   const value = {
     isUserLogged,
     logInUser,
     logOutUser,
-    dataUser: tokenUser,
-    userId: userId
+    userData: userData,
+    userToken: userToken,
   };
 
   return (
