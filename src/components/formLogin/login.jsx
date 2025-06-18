@@ -22,11 +22,8 @@ export default function Login() {
 
   const iniciarSesion = async ()=>
     {
-      setIsLoading(true)
-      const validacion = true; //Aquí llama a la función que valida
-      if(validacion)
-      {
-        try
+        const validacion = true; 
+        if(validacion)
         {
           const data = { usuario: usuario, contrasenia: contrasena}
           await logInUser(data);

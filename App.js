@@ -51,20 +51,22 @@ export default function App() {
   const isAndroid = !!Constants.platform?.android;
   const isIOS = !!Constants.platform?.ios;
   const cssStyleWeb = isWeb ? styles.webContainer : null
+  
+  
   return (
-    <SafeAreaProvider>
-      <ApiHooksProvider>
-        <UserLoggedStatusProvider>
-          <NavigationContainer>
-            <SafeAreaView style={[styles.container, cssStyleWeb]}>
-              <Footer></Footer>
-              <StackNavigation />
-              <Header></Header>
-            </SafeAreaView>
-          </NavigationContainer>
-        </UserLoggedStatusProvider>
-      </ApiHooksProvider>
-    </SafeAreaProvider>
+     <SafeAreaProvider>
+       <ApiHooksProvider>
+         <UserLoggedStatusProvider>
+           <NavigationContainer>
+             <SafeAreaView style={[styles.container, cssStyleWeb]}>
+               <Footer></Footer>
+               <StackNavigation />
+               <Header></Header>
+             </SafeAreaView>
+           </NavigationContainer>
+         </UserLoggedStatusProvider>
+       </ApiHooksProvider>
+     </SafeAreaProvider>
   );
 }
 
