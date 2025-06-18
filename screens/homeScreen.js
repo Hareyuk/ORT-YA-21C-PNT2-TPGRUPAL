@@ -79,7 +79,7 @@ export default function Home() {
           </View>
         </View>
         <View style={styles.sectionGalleryCards}>
-          Las 10 cartas
+          <Text>Las 10 cartas</Text>
         </View>
       </ScrollView>
     </View>
