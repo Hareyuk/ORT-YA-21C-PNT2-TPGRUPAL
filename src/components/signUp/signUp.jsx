@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -18,35 +18,62 @@ export default function SignUp() {
   const [fechaNacimiento, setFechaNacimiento] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [confirmarContrasena, setConfirmarContrasena] = useState("");
-  
+  const [errores, setErrores] = useState({});
+  const [formValido, setFormValido] = useState(false);
+
   const { apiPostCreateUser } = useApiHooks();
 
-  const crearCuenta = async () => {
-    //Validar
+  useEffect(() => {
+    validarFormulario();
+  }, [usuario, email, confirmarEmail, contrasena, confirmarContrasena]);
 
+  const validarFormulario = () => {
+    const nuevosErrores = {};
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const regexContrasena = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/;
+
+    if (usuario.trim().length < 5) {
+      nuevosErrores.usuario = "El usuario debe tener al menos 5 caracteres.";
+    }
+
+    if (!regexEmail.test(email)) {
+      nuevosErrores.email = "El email no tiene un formato válido.";
+    }
+
+    if (email !== confirmarEmail) {
+      nuevosErrores.confirmarEmail = "Los emails no coinciden.";
+    }
+
+    if (!regexContrasena.test(contrasena)) {
+      nuevosErrores.contrasena =
+        "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un símbolo.";
+    }
+
+    if (contrasena !== confirmarContrasena) {
+      nuevosErrores.confirmarContrasena = "Las contraseñas no coinciden.";
+    }
+
+    setErrores(nuevosErrores);
+    setFormValido(Object.keys(nuevosErrores).length === 0);
+    return Object.keys(nuevosErrores).length === 0;
+  };
+
+  const crearCuenta = async () => {
+    const esValido = validarFormulario();
+    if (!esValido) return;
 
     const data = {
-      usuario: usuario,
-      email: email,
+      usuario,
+      email,
       fechaNac: fechaNacimiento,
       contrasenia: contrasena,
     };
-    console.log("Datos de registro:", data);
-    const validarForm = true; //Aquí iría la función que valida los campos
-    if(!validarForm)
-    {
-      //Error notificacion al registrarse
-    }
 
-    try
-    {
-      const responseOk = await apiPostCreateUser(data);
-      //Todo OK, mandar a inicio con notificación de registro correcto  
-    }
-    catch(e)
-    {
-      //Prevenir error
-      //Notificación de que hubo un error
+    try {
+      await apiPostCreateUser(data);
+      // Podés agregar un mensaje en pantalla o redireccionar
+    } catch (e) {
+      // Mostrar error de conexión o guardado si querés
     }
   };
 
@@ -67,6 +94,8 @@ export default function SignUp() {
         value={usuario}
         onChangeText={setUsuario}
       />
+      {errores.usuario && <Text style={{ color: "red" }}>{errores.usuario}</Text>}
+
       <TextInput
         style={estilos.input}
         placeholder="Email"
@@ -75,6 +104,8 @@ export default function SignUp() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
+      {errores.email && <Text style={{ color: "red" }}>{errores.email}</Text>}
+
       <TextInput
         style={estilos.input}
         placeholder="Confirmar Email"
@@ -83,12 +114,17 @@ export default function SignUp() {
         keyboardType="email-address"
         autoCapitalize="none"
       />
+      {errores.confirmarEmail && (
+        <Text style={{ color: "red" }}>{errores.confirmarEmail}</Text>
+      )}
+
       <TextInput
         style={estilos.input}
         placeholder="Fecha de nacimiento (DD/MM/AAAA)"
         value={fechaNacimiento}
         onChangeText={setFechaNacimiento}
       />
+
       <TextInput
         style={estilos.input}
         placeholder="Contraseña"
@@ -96,6 +132,10 @@ export default function SignUp() {
         onChangeText={setContrasena}
         secureTextEntry
       />
+      {errores.contrasena && (
+        <Text style={{ color: "red" }}>{errores.contrasena}</Text>
+      )}
+
       <TextInput
         style={estilos.input}
         placeholder="Confirmar contraseña"
@@ -103,8 +143,18 @@ export default function SignUp() {
         onChangeText={setConfirmarContrasena}
         secureTextEntry
       />
+      {errores.confirmarContrasena && (
+        <Text style={{ color: "red" }}>{errores.confirmarContrasena}</Text>
+      )}
 
-      <TouchableOpacity style={estilos.boton} onPress={crearCuenta}>
+      <TouchableOpacity
+        style={[
+          estilos.boton,
+          { backgroundColor: formValido ? "#3a2a23" : "#ccc" },
+        ]}
+        onPress={crearCuenta}
+        disabled={!formValido}
+      >
         <Text style={estilos.textoBoton}>Crear cuenta</Text>
       </TouchableOpacity>
 
@@ -114,7 +164,9 @@ export default function SignUp() {
         </Text>
       </TouchableOpacity>
 
-      <Text style={estilos.copyright}>© 2025 - Axel Dumas, Martín Palma Sabino y Dylan Sosa Domecq</Text>
+      <Text style={estilos.copyright}>
+        © 2025 - Axel Dumas, Martín Palma Sabino y Dylan Sosa Domecq
+      </Text>
     </ScrollView>
   );
 }
