@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,33 +17,48 @@ export default function Login() {
   const navigation = useNavigation();
   const [usuario, setUsuario] = useState("");
   const [contrasena, setContrasena] = useState("");
-  const { logInUser } = useAuthUser();
+  const [errores, setErrores] = useState({});
+  const [formValido, setFormValido] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const iniciarSesion = async ()=>
-    {
-      try
-      {
-        const validacion = true; 
-        if(validacion)
-        {
-          const data = { usuario: usuario, contrasenia: contrasena}
-          await logInUser(data);
-          //Notificador de que se inició sesión correctamente
-          setIsLoading(false);
-          navigation.navigate("Home");
-        }
-      else
-      {
-        //Error notificación formulario
-        //Mostrar requisitos a completar de form
-      }
-      }
-        catch(e)
-        {
-          //Error notificador de que algo salió mal e intente de nuevo
-        }
-      }
+  const { logInUser } = useAuthUser();
+
+  useEffect(() => {
+    validarFormulario();
+  }, [usuario, contrasena]);
+
+  const validarFormulario = () => {
+    const nuevosErrores = {};
+
+    if (usuario.trim().length === 0) {
+      nuevosErrores.usuario = "El campo usuario es obligatorio.";
+    }
+
+    if (contrasena.trim().length === 0) {
+      nuevosErrores.contrasena = "La contraseña es obligatoria.";
+    }
+
+    setErrores(nuevosErrores);
+    setFormValido(Object.keys(nuevosErrores).length === 0);
+    return Object.keys(nuevosErrores).length === 0;
+  };
+
+  const iniciarSesion = async () => {
+    const valido = validarFormulario();
+    if (!valido) return;
+
+    setIsLoading(true);
+
+    try {
+      const data = { usuario: usuario, contrasenia: contrasena };
+      await logInUser(data);
+      setIsLoading(false);
+      navigation.navigate("Home");
+    } catch (e) {
+      setIsLoading(false);
+      // Mostrar mensaje de error (podés agregar un Toast o mensaje en pantalla)
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={estilos.contenedor}>
@@ -64,6 +79,8 @@ export default function Login() {
         textContentType="username"
         autoComplete="username"
       />
+      {errores.usuario && <Text style={{ color: "red" }}>{errores.usuario}</Text>}
+
       <TextInput
         style={estilos.input}
         placeholder="Contraseña"
@@ -74,8 +91,18 @@ export default function Login() {
         autoComplete="password"
         secureTextEntry
       />
+      {errores.contrasena && (
+        <Text style={{ color: "red" }}>{errores.contrasena}</Text>
+      )}
 
-      <TouchableOpacity style={estilos.boton} onPress={iniciarSesion}>
+      <TouchableOpacity
+        style={[
+          estilos.boton,
+          { backgroundColor: formValido ? "#3a2a23" : "#ccc" },
+        ]}
+        onPress={iniciarSesion}
+        disabled={!formValido}
+      >
         <Text style={estilos.textoBoton}>Iniciar sesión</Text>
       </TouchableOpacity>
 
@@ -85,9 +112,11 @@ export default function Login() {
         </Text>
       </TouchableOpacity>
 
-    
-      <Text style={estilos.copyright}>© 2025 - Axel Dumas, Martín Palma Sabino y Dylan Sosa Domecq</Text>
-      <LoadingScreen isLoading={isLoading} text="Esperando al otro retador"></LoadingScreen>
+      <Text style={estilos.copyright}>
+        © 2025 - Axel Dumas, Martín Palma Sabino y Dylan Sosa Domecq
+      </Text>
+
+      <LoadingScreen isLoading={isLoading} text="Esperando al otro retador" />
     </ScrollView>
   );
-};
+}
