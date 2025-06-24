@@ -17,6 +17,7 @@ import EditProfileView from './screens/editProfileScreen';
 import GameView from './screens/gameScreen';
 import LobbyView from './screens/lobbyScreen';
 import ProfileView from './screens/profileScreen';
+import { NotificadorProvider } from './src/context/NotificadorContext'; // ⬅️ NUEVO IMPORT
 
 const StackNavigation = () => {
   const Stack = createNativeStackNavigator();
@@ -29,11 +30,14 @@ const StackNavigation = () => {
   console.log('isAndroid', isAndroid);
   console.log('isIOS', isIOS);
   return (
-    <Stack.Navigator initialRouteName='Home' screenOptions={{
+    <Stack.Navigator
+      initialRouteName='Home'
+      screenOptions={{
         headerShown: false,
         contentStyle: isWeb ? styles.webContent : null
-      }}>
-      <Stack.Screen name="Home" component={Home}  />
+      }}
+    >
+      <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Login" component={LoginView} />
       <Stack.Screen name="SignUp" component={SignUpView} />
       <Stack.Screen name="Lobby" component={LobbyView} />
@@ -42,31 +46,31 @@ const StackNavigation = () => {
       <Stack.Screen name="EditProfile" component={EditProfileView} />
       <Stack.Screen name="About" component={AboutView} />
     </Stack.Navigator>
-  )
+  );
 }
-
 
 export default function App() {
   const isWeb = !Constants.platform;
   const isAndroid = !!Constants.platform?.android;
   const isIOS = !!Constants.platform?.ios;
-  const cssStyleWeb = isWeb ? styles.webContainer : null
-  
-  
+  const cssStyleWeb = isWeb ? styles.webContainer : null;
+
   return (
-     <SafeAreaProvider>
-       <ApiHooksProvider>
-         <UserLoggedStatusProvider>
-           <NavigationContainer>
-             <SafeAreaView style={[styles.container, cssStyleWeb]}>
-               <Footer></Footer>
-               <StackNavigation />
-               <Header></Header>
-             </SafeAreaView>
-           </NavigationContainer>
-         </UserLoggedStatusProvider>
-       </ApiHooksProvider>
-     </SafeAreaProvider>
+    <SafeAreaProvider>
+      <ApiHooksProvider>
+        <UserLoggedStatusProvider>
+          <NotificadorProvider> {/* ⬅️ NUEVO ENVOLTORIO */}
+            <NavigationContainer>
+              <SafeAreaView style={[styles.container, cssStyleWeb]}>
+                <Footer />
+                <StackNavigation />
+                <Header />
+              </SafeAreaView>
+            </NavigationContainer>
+          </NotificadorProvider>
+        </UserLoggedStatusProvider>
+      </ApiHooksProvider>
+    </SafeAreaProvider>
   );
 }
 
