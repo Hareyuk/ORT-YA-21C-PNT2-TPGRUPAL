@@ -1,8 +1,9 @@
 import { useContext, useState, createContext, useEffect } from "react";
 import { useApiHooks } from "./apiHooks";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
 import AsyncStorage from "../src/services/AsyncStorage";
+const AUTH_KEY = '@auth_data';
+import { jwtDecode } from "jwt-decode";
 
 const UserLoggedStatusContext = createContext(
   {
@@ -16,24 +17,46 @@ const UserLoggedStatusContext = createContext(
 );
 
 export function UserLoggedStatusProvider({ children }) {
+   useEffect(() => {
+    // Necesitamos que al levantar nuestra app, se verifique si hay un auth en el AsyncStorage
+    AsyncStorage.getData(AUTH_KEY).then((data) => {
+      console.log("Encuentro el token en el AsyncStorage", data);
+      if (data) {
+        setUserToken(data);
+      }
+    });
+  }, []);
+
   const [userToken, setUserToken] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isUserLogged, setIsUserLogged] = useState(false);
   //const [isLoading, setIsLoading] = useState(true);
 
-  const { apiPostLoginuser, apiGetUserById } = useApiHooks();
+  //useEffect para obtener datos del token cada vez que se inicia sesión
+  useEffect(() => {
+    if(userToken) //Si existe token, hay usuario para obtener datos
+    {
+      const decoded = jwtDecode(userToken);
+      //console.log('Usuario decodificado: ', decoded);
+      setUserData(decoded);
+      setIsUserLogged(true);
+      console.log('Ya está iniciado sesión');
+      
+    }
+  }, [userToken])
+  
+
+  const { apiPostLoginuser } = useApiHooks();
 
   const logInUser = async (data) => {
     //Request user login here
     let responseOk = true;
     try
     {
-      const userToken = await apiPostLoginuser(data);    
+      const userToken = await apiPostLoginuser(data);
       if(userToken) {
-        setUserToken(userToken);
-
-        setUserData(jsonData);
-        setIsUserLogged(true);
+        setUserToken(userToken.token);
+        AsyncStorage.storeData(AUTH_KEY, userToken.token)
       }
       else
       {
@@ -53,6 +76,7 @@ export function UserLoggedStatusProvider({ children }) {
     setIsUserLogged(false)
     setUserToken(null);
     setUserData(null);
+    AsyncStorage.removeData(AUTH_KEY);
   };
 
   const value = {
