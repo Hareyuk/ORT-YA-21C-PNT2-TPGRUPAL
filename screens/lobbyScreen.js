@@ -7,49 +7,35 @@ import LoadingScreen from "../src/components/loading/loading";
 import { useNavigation } from "@react-navigation/native";
 // import { useAuthUser } from "../../hooks/userLogged"; // <--- REMOVIDO
 import socket from '../src/services/socketService'; // Asegúrate de que esta ruta sea correcta
-
-// Helper para generar IDs de usuario únicos (TEMPORAL para testing sin login)
-const generateUniqueId = () => {
-    // Podrías usar algo más robusto como uuid si lo instalas: import { v4 as uuidv4 } from 'uuid';
-    // return uuidv4();
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-};
+import { useAuthUser } from "../hooks/userLogged";
+import { navigate } from "expo-router/build/global-state/routing";
+import { ApiHooksProvider } from "../hooks/apiHooks";
 
 export default function LobbyView() {
+
+  const { userData } = useAuthUser();
   const navigation = useNavigation();
-  // const { isUserLogged, dataUser, isLoading: isAuthLoading } = useAuthUser(); // <--- REMOVIDO
-  // Datos de usuario simulados para testear sin login
-  const [simulatedUserId, setSimulatedUserId] = useState(null);
-  const [simulatedUserName, setSimulatedUserName] = useState('');
-
-
   const [isLoading, setIsLoading] = useState(false);
   const [isChecked, setChecked] = useState(false); //For private rooms
   const [currentRoomState, setCurrentRoomState] = useState(null);
 
-  // Genera un ID de usuario al cargar el componente (si no existe)
-  // ¡IMPORTANTE! Esto generará un nuevo ID cada vez que el componente se monte,
-  // lo cual puede ser problemático si no persiste.
-  // Idealmente, este ID vendría del proceso de LOGIN.
   useEffect(() => {
-    if (!simulatedUserId) {
-      const newId = generateUniqueId();
-      setSimulatedUserId(newId);
-      // Para diferenciar en dos emuladores, puedes hardcodear un nombre distinto
-      // o usar el ID para el nombre, ej: setSimulatedUserName(`Jugador-${newId.substring(0, 5)}`);
-      setSimulatedUserName(`Jugador-${Math.floor(Math.random() * 1000)}`);
-      console.log(`LobbyView: Generado ID de usuario simulado: ${newId}, Nombre: ${simulatedUserName}`);
+    if (!userData)
+    {
+      //No hay usuario cargado
+      navigation.navigate("Home");
     }
-  }, [simulatedUserId, simulatedUserName]); // Asegura que se ejecuta una vez por sesión simulada
+  }, []); // Asegura que se ejecuta una vez al cargar la página
 
 
   // --- Lógica de Socket.IO para recibir el estado de la sala ---
-  useEffect(() => {
+  useEffect( () => {
+    setIsLoading(true);
     // Listener para el estado actualizado de la sala
     socket.on('ESTADO_SALA_ACTUALIZADO', (sala) => {
       console.log('LobbyView - Estado de la sala actualizado:', sala);
       setCurrentRoomState(sala);
-      setIsLoading(false); // Ocultar spinner si se actualizó el estado
+      //setIsLoading(false); // Ocultar spinner si se actualizó el estado
 
       // Si la sala ahora tiene 2 jugadores y el juego ha comenzado (o está esperando orden)
       if (sala.jugadores.length === 2 && sala.estado !== 'esperando-jugadores') {
@@ -57,7 +43,7 @@ export default function LobbyView() {
         console.log('LobbyView: Dos jugadores encontrados, navegando a GameView.');
         // ¡Ojo! Necesitas asegurarte de que GameView tenga el userId correcto.
         // Aquí pasamos los datos del "usuario simulado" al GameView.
-        navigation.navigate('Game', { userId: simulatedUserId, userName: simulatedUserName });
+        navigation.navigate('Game', { userId: userData.id, userName: userData });
       }
     });
 
@@ -67,13 +53,14 @@ export default function LobbyView() {
       Alert.alert('Error del Servidor', error.mensaje || 'Ha ocurrido un error desconocido.');
       setIsLoading(false); // Asegúrate de quitar el spinner en caso de error
     });
-
+  
+    setIsLoading(false);
     // Limpiar listeners al desmontar el componente
     return () => {
       socket.off('ESTADO_SALA_ACTUALIZADO');
       socket.off('ERROR');
     };
-  }, [navigation, simulatedUserId, simulatedUserName]); // Dependencias para re-ejecutar
+  }, [navigation, userData]); // Dependencias para re-ejecutar
 
   // --- Funciones para interactuar con el Backend (vía Socket.IO) ---
 
@@ -83,19 +70,14 @@ export default function LobbyView() {
       Alert.alert('Sala Llena', 'Esta sala ya tiene dos jugadores. Intenta más tarde.');
       return;
     }
-    if (!simulatedUserId || !simulatedUserName) {
-        Alert.alert('Error', 'No se pudo generar ID o nombre de usuario simulado. Intenta recargar.');
-        return;
-    }
 
-    console.log(`[Lobby] Intentando unirse a la sala con usuario simulado:`, { id: simulatedUserId, usuario: simulatedUserName });
+    console.log(`[Lobby] Intentando unirse a la sala con usuario simulado:`, { id: userData.id, usuario: userData });
     setIsLoading(true); // Mostrar spinner
     // Envía el evento UNIRSE_JUEGO con los datos del usuario simulado
     socket.emit('UNIRSE_JUEGO', {
       usuario: {
-        id: simulatedUserId,
-        usuario: simulatedUserName, // El backend espera un objeto 'usuario' con 'id' y 'usuario'
-        // Puedes añadir otros campos si tu backend los necesita: email, fechaNac, etc.
+        id: userData.id,
+        usuario: userData, // El backend espera un objeto 'usuario' con 'id' y 'usuario'
       }
     });
   };
@@ -113,11 +95,6 @@ export default function LobbyView() {
     handleJoinGame();
   };
 
-  // Si se está cargando (esperando al otro retador)
-  if (isLoading) {
-    return <LoadingScreen isLoading={isLoading} text="Esperando al otro retador" />;
-  }
-
   // Contenido principal del Lobby
   return (
     <View style={styles.container}>
@@ -129,7 +106,7 @@ export default function LobbyView() {
               style={styles.avatar}
             />
             <Text style={[styles.whiteText, styles.bigText, styles.containerUserTexts]}>
-              <Text style={{display: "block", textAlign: "center"}}>Usuario: {simulatedUserName}</Text>
+              <Text style={{display: "block", textAlign: "center"}}>Usuario: {userData.usuario}</Text>
               <Text style={{display: "block", textAlign: "center"}}>Victorias: --</Text>
               <Text style={{display: "block", textAlign: "center"}}>Derrotas: --</Text>
             </Text>
@@ -171,6 +148,7 @@ export default function LobbyView() {
           </View>
         </View>
       </View>
+      <LoadingScreen isLoading={isLoading} text="Esperando al otro retador" />;
     </View>
   );
 }
