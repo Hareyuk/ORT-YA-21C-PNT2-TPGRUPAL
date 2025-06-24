@@ -54,7 +54,8 @@ export function ApiHooksProvider({ children }) {
       else
       {
         const data = await res.json();
-        console.log('Success response:', data);
+        responseOk = data;
+        //console.log('Success response:', data);
       }
       return responseOk;
     } catch (e) {

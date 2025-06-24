@@ -2,6 +2,7 @@ import { useContext, useState, createContext, useEffect } from "react";
 import { useApiHooks } from "./apiHooks";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
+import AsyncStorage from "../src/services/AsyncStorage";
 
 const UserLoggedStatusContext = createContext(
   {
