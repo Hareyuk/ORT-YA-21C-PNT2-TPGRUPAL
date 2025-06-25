@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import Room from "../src/components/room/room";
 import LoadingScreen from "../src/components/loading/loading";
 import { useNavigation } from "@react-navigation/native";
-// import { useAuthUser } from "../../hooks/userLogged"; // <--- REMOVIDO
 import socket from '../src/services/socketService'; // Asegúrate de que esta ruta sea correcta
 import { useAuthUser } from "../hooks/userLogged";
 import { navigate } from "expo-router/build/global-state/routing";
@@ -31,18 +30,14 @@ export default function LobbyView() {
   // --- Lógica de Socket.IO para recibir el estado de la sala ---
   useEffect( () => {
     setIsLoading(true);
+    
     // Listener para el estado actualizado de la sala
     socket.on('ESTADO_SALA_ACTUALIZADO', (sala) => {
       console.log('LobbyView - Estado de la sala actualizado:', sala);
       setCurrentRoomState(sala);
-      //setIsLoading(false); // Ocultar spinner si se actualizó el estado
-
       // Si la sala ahora tiene 2 jugadores y el juego ha comenzado (o está esperando orden)
       if (sala.jugadores.length === 2 && sala.estado !== 'esperando-jugadores') {
-        // Redirigir al GameView
         console.log('LobbyView: Dos jugadores encontrados, navegando a GameView.');
-        // ¡Ojo! Necesitas asegurarte de que GameView tenga el userId correcto.
-        // Aquí pasamos los datos del "usuario simulado" al GameView.
         navigation.navigate('Game', { userId: userData.id, userName: userData });
       }
     });
@@ -51,16 +46,18 @@ export default function LobbyView() {
     socket.on('ERROR', (error) => {
       console.error('LobbyView - Error del servidor:', error);
       Alert.alert('Error del Servidor', error.mensaje || 'Ha ocurrido un error desconocido.');
-      setIsLoading(false); // Asegúrate de quitar el spinner en caso de error
     });
   
     setIsLoading(false);
-    // Limpiar listeners al desmontar el componente
+      // Ahora sí pide al armarse este emit de recibir sala 
+
+    socket.emit('SOLICITAR_SALA_INICIAL');
+    
     return () => {
       socket.off('ESTADO_SALA_ACTUALIZADO');
       socket.off('ERROR');
     };
-  }, [navigation, userData]); // Dependencias para re-ejecutar
+  }, []);
 
   // --- Funciones para interactuar con el Backend (vía Socket.IO) ---
 
@@ -85,6 +82,11 @@ export default function LobbyView() {
   const onSearchRoom = () => {
     Alert.alert('Funcionalidad Pendiente', 'La búsqueda de salas aún no está implementada en el backend actual.');
   };
+
+  const onUpdateRooms = () =>
+  {
+    socket.emit('SOLICITAR_SALA_INICIAL');
+  }
 
   const onCreateRoom = () => {
     Alert.alert('Funcionalidad Pendiente', 'La creación de salas múltiples aún no está implementada en el backend actual.');
@@ -119,6 +121,7 @@ export default function LobbyView() {
               <Text style={[styles.whiteText, styles.textInfo]}>Buscar sala</Text>
               <TextInput style={styles.inputTxt}></TextInput>
               <Button cb={onSearchRoom}>Buscar</Button>
+              <Button cb={onUpdateRooms}>Actualizar salas</Button>
             </View>
             <View style={styles.displayListRooms}>
               {/* Aquí renderizamos la "sala única" del backend */}
@@ -131,9 +134,6 @@ export default function LobbyView() {
                 />
               ) : (
                 <Text style={styles.whiteText}>Cargando información de la sala...</Text>
-              )}
-              {currentRoomState && currentRoomState.jugadores.length < 2 && (
-                <Text style={styles.whiteText}>Esperando a 2 jugadores...</Text>
               )}
             </View>
             <View style={styles.containerHorizontalContent}>

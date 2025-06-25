@@ -1,19 +1,10 @@
 import io from 'socket.io-client';
 import {API_URL, API_GAME} from '@env';
+import { useAuthUser } from '../../hooks/userLogged';
 
-
-const SOCKET_SERVER_URL = API_URL;
-// Inicializa la conexión de Socket.IO
-// Puedes pasar opciones aquí, como un token de autenticación
-// si fueras a implementar la autenticación en el socket:
-// const socket = io(SOCKET_SERVER_URL, {
-//   auth: {
-//     token: 'tu_jwt_token_aqui' // Vendría de AsyncStorage después del login
-//   }
-// });
+const SOCKET_SERVER_URL = 'http://localhost:8080';
 const socket = io(SOCKET_SERVER_URL,
   {
-    path: API_GAME,
     transports: ["websocket"]
   }
 );

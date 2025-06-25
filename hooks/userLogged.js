@@ -20,7 +20,7 @@ export function UserLoggedStatusProvider({ children }) {
    useEffect(() => {
     // Necesitamos que al levantar nuestra app, se verifique si hay un auth en el AsyncStorage
     AsyncStorage.getData(AUTH_KEY).then((data) => {
-      console.log("Encuentro el token en el AsyncStorage", data);
+      //console.log("Encuentro el token en el AsyncStorage", data);
       if (data) {
         setUserToken(data);
       }
@@ -40,8 +40,7 @@ export function UserLoggedStatusProvider({ children }) {
       //console.log('Usuario decodificado: ', decoded);
       setUserData(decoded);
       setIsUserLogged(true);
-      console.log('Ya está iniciado sesión');
-      
+      //console.log('Ya está iniciado sesión');
     }
   }, [userToken])
   

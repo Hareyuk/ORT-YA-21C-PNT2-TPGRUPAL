@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator, StyleSheet, Button, Alert } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import socket from '../src/services/socketService'; // Asegúrate de que esta ruta sea correcta
+import { useAuthUser } from "../hooks/userLogged";
 
 export default function GameView() {
   const navigation = useNavigation();
-  const [userId, setUserId] = useState('placeholder_user_id'); // Puedes cambiar esto o pasarlo por params
-  const [userName, setUserName] = useState('Jugador Placeholder'); // Puedes cambiar esto o pasarlo por params
+  const { userData } = useAuthUser();
 
   const [salaEstado, setSalaEstado] = useState(null);
 
@@ -20,7 +20,7 @@ export default function GameView() {
 
       // Lógica para el fin del juego por desconexión
       if (sala.estado === 'juego-finalizado' && sala.ganador) {
-        if (sala.ganador === userId) { // Usamos userId del estado local
+        if (sala.ganador === userData.id) { // Usamos userData.id del estado local
           Alert.alert('¡Victoria!', `¡Has ganado la partida! El otro jugador se desconectó.`);
         }
         // Puedes navegar de nuevo al Lobby o Home después de un breve retraso
@@ -40,13 +40,13 @@ export default function GameView() {
       socket.off('ESTADO_SALA_ACTUALIZADO');
       socket.off('ERROR');
     };
-  }, [userId, navigation]); // Dependencias para re-ejecutar si userId o navigation cambian
+  }, [userData.id, navigation]); // Dependencias para re-ejecutar si userData.id o navigation cambian
 
   // --- Funciones para enviar acciones al Backend ---
   const handleOrdenarCartas = () => {
-    if (!salaEstado || !userId) return Alert.alert('Error', 'No hay datos de sala o usuario.');
+    if (!salaEstado || !userData.id) return Alert.alert('Error', 'No hay datos de sala o usuario.');
 
-    const jugadorActual = salaEstado.jugadores.find(j => j.id === userId);
+    const jugadorActual = salaEstado.jugadores.find(j => j.id === userData.id);
     if (!jugadorActual || jugadorActual.ordenadas) {
         return Alert.alert('Info', 'Ya ordenaste tus cartas o no eres un jugador activo.');
     }
@@ -56,8 +56,8 @@ export default function GameView() {
     // Esto es solo un placeholder: deberías obtener el orden real de tus cartas en la UI.
     const nuevoOrden = [...jugadorActual.cartas].sort(() => Math.random() - 0.5).map(c => c.id);
 
-    console.log(`[GameView] Enviando ORDENAR_CARTAS para ${userId}:`, nuevoOrden);
-    socket.emit('ORDENAR_CARTAS', { id: userId, nuevoOrden: nuevoOrden });
+    console.log(`[GameView] Enviando ORDENAR_CARTAS para ${userData.id}:`, nuevoOrden);
+    socket.emit('ORDENAR_CARTAS', { id: userData.id, nuevoOrden: nuevoOrden });
   };
 
   const handleEnfrentarCartas = () => {
@@ -75,26 +75,14 @@ export default function GameView() {
     console.log('[GameView] Enviando AVANZAR_RONDA');
     socket.emit('AVANZAR_RONDA');
   };
-
-  // Si la sala no ha cargado aún
-  if (!salaEstado) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={styles.loadingText}>Esperando estado de la sala...</Text>
-      </View>
-    );
-  }
-
   // Renderizado principal de la pantalla de juego
-  const jugadorLocal = salaEstado.jugadores.find(j => j.id === userId);
-  const otroJugador = salaEstado.jugadores.find(j => j.id !== userId);
-
-
+  const jugadorLocal = salaEstado.jugadores.find(j => j.id === userData.id);
+  const otroJugador = salaEstado.jugadores.find(j => j.id !== userData.id);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Pantalla videojuego - {userName}</Text>
+      {/* poner Loading */}
+      <Text style={styles.title}>Pantalla videojuego - {userData.usuario}</Text>
       <Text>Estado de la Sala: {salaEstado.estado}</Text>
       <Text>Ronda: {salaEstado.ronda}</Text>
 
