@@ -4,13 +4,16 @@ import styles from "./styles";
 
 export default function Room(props) {
     const { isPlaying, user1, user2, selectRoom } = props;
+    console.log('PROPS: ', props);
     return (
-        <TouchableOpacity style={styles.boxContainer} onPress={selectRoom}>
-            <View style={styles.textColumn}>
-                <Text style={[styles.textInfo, styles.textBold]}>Estado: {!isPlaying ? "En espera" : "Lleno"}</Text>
-                <Text style={styles.textInfo}>{user1 != null ? user1.usuario : "Esperando jugador 1"}</Text>
-                <Text style={styles.textInfo}>{user2 != null ? user2.usuario : "Esperando jugador 2"}</Text>
-            </View>
-        </TouchableOpacity>
+        <>
+            <TouchableOpacity style={styles.boxContainer} onPress={selectRoom}>
+                <View style={styles.textColumn}>
+                    <Text style={[styles.textInfo, styles.textBold]}>Estado: {!isPlaying ? "En espera" : "Lleno"}</Text>
+                    <Text style={styles.textInfo}>{user1 != null ? user1.usuario.usuario.usuario : "Esperando jugador 1"}</Text>
+                    <Text style={styles.textInfo}>{user2 != null ? user2.usuario.usuario.usuario : "Esperando jugador 2"}</Text>
+                </View>
+            </TouchableOpacity>
+        </>
     );
 }

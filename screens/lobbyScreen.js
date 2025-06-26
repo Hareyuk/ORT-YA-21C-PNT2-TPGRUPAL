@@ -34,6 +34,7 @@ export default function LobbyView() {
     // Listener para el estado actualizado de la sala
     socket.on('ESTADO_SALA_ACTUALIZADO', (sala) => {
       console.log('LobbyView - Estado de la sala actualizado:', sala);
+      console.log(sala);
       setCurrentRoomState(sala);
       // Si la sala ahora tiene 2 jugadores y el juego ha comenzado (o está esperando orden)
       if (sala.jugadores.length === 2 && sala.estado !== 'esperando-jugadores') {
@@ -50,7 +51,6 @@ export default function LobbyView() {
   
     setIsLoading(false);
       // Ahora sí pide al armarse este emit de recibir sala 
-
     socket.emit('SOLICITAR_SALA_INICIAL');
     
     return () => {
@@ -63,11 +63,17 @@ export default function LobbyView() {
 
   const handleJoinGame = async () => {
     // Si la sala ya tiene 2 jugadores, no permitas unirse
-    if (currentRoomState && currentRoomState.jugadores.length >= 2) {
-      Alert.alert('Sala Llena', 'Esta sala ya tiene dos jugadores. Intenta más tarde.');
-      return;
+    try
+    {
+      if (currentRoomState && currentRoomState.jugadores.length >= 2) {
+        Alert.alert('Sala Llena', 'Esta sala ya tiene dos jugadores. Intenta más tarde.');
+        return;
+      }
     }
-
+    catch (e)
+    {
+      console.error('ERROR en handle join: ', e); 
+    }
     console.log(`[Lobby] Intentando unirse a la sala con usuario simulado:`, { id: userData.id, usuario: userData });
     setIsLoading(true); // Mostrar spinner
     // Envía el evento UNIRSE_JUEGO con los datos del usuario simulado

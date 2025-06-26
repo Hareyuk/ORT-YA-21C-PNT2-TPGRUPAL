@@ -4,6 +4,7 @@ import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
 import AsyncStorage from "../src/services/AsyncStorage";
 const AUTH_KEY = '@auth_data';
 import { jwtDecode } from "jwt-decode";
+import socket from "../src/services/socketService";
 
 const UserLoggedStatusContext = createContext(
   {
@@ -11,7 +12,8 @@ const UserLoggedStatusContext = createContext(
     logInUser: () => {},
     logOutUser: () => {},
     userData: null,
-    userToken: null
+    userToken: null,
+    userCountry: null,
     //isLoading: true
   }
 );
@@ -30,6 +32,7 @@ export function UserLoggedStatusProvider({ children }) {
   const [userToken, setUserToken] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isUserLogged, setIsUserLogged] = useState(false);
+  const [userCountry, setUserCountry] = useState(null)
   //const [isLoading, setIsLoading] = useState(true);
 
   //useEffect para obtener datos del token cada vez que se inicia sesión
@@ -41,6 +44,15 @@ export function UserLoggedStatusProvider({ children }) {
       setUserData(decoded);
       setIsUserLogged(true);
       //console.log('Ya está iniciado sesión');
+
+      /* socket.on('PAIS_DETECTADO', (sala) => {
+      console.log('LobbyView - Estado de la sala actualizado:', sala);
+      // Si la sala ahora tiene 2 jugadores y el juego ha comenzado (o está esperando orden)
+      if (sala.jugadores.length === 2 && sala.estado !== 'esperando-jugadores') {
+        console.log('LobbyView: Dos jugadores encontrados, navegando a GameView.');
+        navigation.navigate('Game', { userId: userData.id, userName: userData });
+      }
+    }); */
     }
   }, [userToken])
   
