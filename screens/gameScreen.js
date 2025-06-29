@@ -4,25 +4,38 @@ import { View, Text, ActivityIndicator, StyleSheet, Button, Alert } from "react-
 import { useNavigation } from "@react-navigation/native";
 import socket from '../src/services/socketService'; // Asegúrate de que esta ruta sea correcta
 import { useAuthUser } from "../hooks/userLogged";
-
+import LoadingScreen from "../src/components/loading/loading";
 export default function GameView() {
-  const navigation = useNavigation();
+  const cards_images = ['','','','','','','','','','','','','','','','','','']
   const { userData } = useAuthUser();
-
+  const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(false);
+  const [userLocal, setUserLocal] = useState(null);
+  const [userEnemy, setUserEnemy] = useState(null);
+  const [cardsPlayer, setCardsPlayer] = useState([])
+  const [cardsPlayerOrder, setCardsPlayerOrder] = useState([]) //Que tenga los IDs
   const [salaEstado, setSalaEstado] = useState(null);
 
   // --- Lógica de Socket.IO para recibir el estado del juego ---
   useEffect(() => {
+    
+      // Ahora sí pide al armarse este emit de recibir sala 
+    socket.emit('SOLICITAR_SALA_INICIAL');
+
     // Escuchar el estado de la sala actualizado
     socket.on('ESTADO_SALA_ACTUALIZADO', (sala) => {
       console.log('GameView - Estado de la sala actualizado:', sala);
       setSalaEstado(sala);
-
       // Lógica para el fin del juego por desconexión
       if (sala.estado === 'juego-finalizado' && sala.ganador) {
-        if (sala.ganador === userData.id) { // Usamos userData.id del estado local
-          Alert.alert('¡Victoria!', `¡Has ganado la partida! El otro jugador se desconectó.`);
+        if (sala.ganador === salaEstado.jugadorActual.id) { 
+          Alert.alert('VICTORIA', `¡Has ganado la partida! El otro jugador se desconectó.`);
         }
+        else
+        {
+          Alert.alert('DERROTA', `Has perdido la partida.`);
+        }
+        setIsLoading(false);
         // Puedes navegar de nuevo al Lobby o Home después de un breve retraso
         setTimeout(() => navigation.replace('Lobby'), 3000);
       }
@@ -34,14 +47,12 @@ export default function GameView() {
         Alert.alert('Error del Servidor', error.mensaje || 'Ha ocurrido un error en el juego.');
     });
 
-
     // Limpiar listeners al desmontar el componente
     return () => {
       socket.off('ESTADO_SALA_ACTUALIZADO');
       socket.off('ERROR');
     };
-  }, [userData.id, navigation]); // Dependencias para re-ejecutar si userData.id o navigation cambian
-
+  }, []);
   // --- Funciones para enviar acciones al Backend ---
   const handleOrdenarCartas = () => {
     if (!salaEstado || !userData.id) return Alert.alert('Error', 'No hay datos de sala o usuario.');
@@ -54,8 +65,7 @@ export default function GameView() {
     // EJEMPLO: Ordenar cartas al azar para probar. En un juego real, la UI
     // permitiría al usuario arrastrar y soltar las cartas para definir el nuevoOrden.
     // Esto es solo un placeholder: deberías obtener el orden real de tus cartas en la UI.
-    const nuevoOrden = [...jugadorActual.cartas].sort(() => Math.random() - 0.5).map(c => c.id);
-
+    //const nuevoOrden = [...jugadorActual.cartas].sort(() => Math.random() - 0.5).map(c => c.id);
     console.log(`[GameView] Enviando ORDENAR_CARTAS para ${userData.id}:`, nuevoOrden);
     socket.emit('ORDENAR_CARTAS', { id: userData.id, nuevoOrden: nuevoOrden });
   };
@@ -75,38 +85,62 @@ export default function GameView() {
     console.log('[GameView] Enviando AVANZAR_RONDA');
     socket.emit('AVANZAR_RONDA');
   };
-  // Renderizado principal de la pantalla de juego
-  const jugadorLocal = salaEstado.jugadores.find(j => j.id === userData.id);
-  const otroJugador = salaEstado.jugadores.find(j => j.id !== userData.id);
 
+  const selectOrderCardIndividual = ()=>
+  {
+
+  }
+
+  useEffect(() => {
+      if(salaEstado)
+      {
+        console.log("LOG ESTADO:");
+        console.log(salaEstado);
+        setUserLocal(salaEstado.jugadores.find(j => j.id === userData.id));
+        setUserEnemy(salaEstado.jugadores.find(j => j.id !== userData.id));
+        console.log("Jugadores seteados");
+        setCardsPlayer(userLocal.cartas)
+      }
+  }, [salaEstado])
+  // Renderizado principal de la pantalla de juego
+  if(!salaEstado || !userLocal || cardsPlayer)
+  {
+    return(
+      <View>
+        <LoadingScreen isLoading={isLoading} text="Preparando sala..."/>
+      </View>
+    )
+  }
   return (
     <View style={styles.container}>
-      {/* poner Loading */}
       <Text style={styles.title}>Pantalla videojuego - {userData.usuario}</Text>
       <Text>Estado de la Sala: {salaEstado.estado}</Text>
       <Text>Ronda: {salaEstado.ronda}</Text>
 
       {salaEstado.jugadores.length < 2 && <Text>Esperando más jugadores...</Text>}
-
-      {jugadorLocal && (
+      {userLocal && (
         <View style={styles.playerSection}>
-          <Text style={styles.playerName}>Tus Cartas ({jugadorLocal.cartas.length}):</Text>
+          <Text style={styles.playerName}>Tus Cartas ({cardsPlayer.length}):</Text>
           <View style={styles.cardsContainer}>
-            {jugadorLocal.cartas.map(card => (
-              <Text key={card.id} style={styles.card}>{card.tipo}</Text>
+            {cardsPlayer.map(card => (
+              <View>
+                <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text>
+                <Button title="Elegir orden carta" onPress={()=>selectOrderCardIndividual(card.id)} />
+                (card.pos_card && <Text>Orden: {card.pos_card}</Text>)
+              </View>
             ))}
           </View>
-          <Text>Cartas ordenadas: {jugadorLocal.ordenadas ? 'Sí' : 'No'}</Text>
-          {salaEstado.estado === 'esperando-orden' && !jugadorLocal.ordenadas && (
+          <Text>Cartas ordenadas: {cardsPlayerOrder ? 'Sí' : 'No'}</Text>
+          {salaEstado.estado === 'esperando-orden' && !cardsPlayerOrder && (
             <Button title="Ordenar Mis Cartas" onPress={handleOrdenarCartas} />
           )}
         </View>
       )}
 
-      {otroJugador && (
+      {userEnemy && (
         <View style={styles.playerSection}>
-          <Text style={styles.playerName}>Cartas de {otroJugador.usuario} ({otroJugador.cartas.length}):</Text>
-          <Text>Ordenadas: {otroJugador.ordenadas ? 'Sí' : 'No'}</Text>
+          <Text style={styles.playerName}>Cartas de {userEnemy.usuario} ({userEnemy.cartas.length}):</Text>
+          <Text>Ordenadas: {userEnemy.ordenadas ? 'Sí' : 'No'}</Text>
         </View>
       )}
 
@@ -117,8 +151,8 @@ export default function GameView() {
       {salaEstado.estado === 'partida-finalizada' && salaEstado.resultado && (
         <View style={styles.resultsSection}>
           <Text style={styles.resultsTitle}>Resultados de la Ronda:</Text>
-          <Text>{jugadorLocal?.usuario}: {salaEstado.resultado[jugadorLocal.id]}</Text>
-          <Text>{otroJugador?.usuario}: {salaEstado.resultado[otroJugador.id]}</Text>
+          <Text>{userLocal?.usuario}: {salaEstado.resultado[userLocal.id]}</Text>
+          <Text>{userEnemy?.usuario}: {salaEstado.resultado[userEnemy.id]}</Text>
           {salaEstado.ganador && salaEstado.finalizada ? (
             <Text style={styles.winnerText}>Ganador del Juego: {salaEstado.jugadores.find(j => j.id === salaEstado.ganador)?.usuario}</Text>
           ) : (
@@ -129,7 +163,8 @@ export default function GameView() {
             <Button title="Avanzar a Siguiente Ronda" onPress={handleAvanzarRonda} />
           )}
         </View>
-      )}
+      )}  
+    <LoadingScreen isLoading={isLoading} text="Cargando partida..." />;
     </View>
   );
 }
@@ -139,7 +174,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#0e0c0c',
     padding: 20,
   },
   loadingContainer: {

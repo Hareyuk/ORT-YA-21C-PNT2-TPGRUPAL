@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@expo/metro-runtime": "^5.0.4",
     "@react-native-community/cli": "latest",
     "@types/react": "~19.0.10",
     "typescript": "~5.8.3"
