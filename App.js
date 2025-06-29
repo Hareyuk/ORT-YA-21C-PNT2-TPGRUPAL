@@ -29,6 +29,8 @@ const StackNavigation = () => {
   console.log('isWeb', isWeb);
   console.log('isAndroid', isAndroid);
   console.log('isIOS', isIOS);
+
+  
   return (
     <Stack.Navigator
       initialRouteName='Home'
