@@ -75,7 +75,7 @@ export default function SignUp() {
       email,
       fechaNac: fechaNacimiento,
       contrasenia: contrasena,
-      pfp: randomImg
+      //pfp: randomImg
     };
 
     try {

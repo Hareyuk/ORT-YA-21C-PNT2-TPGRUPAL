@@ -1,20 +1,44 @@
 
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, StyleSheet, Button, Alert } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, Button, Alert, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import socket from '../src/services/socketService'; // Asegúrate de que esta ruta sea correcta
 import { useAuthUser } from "../hooks/userLogged";
 import LoadingScreen from "../src/components/loading/loading";
 export default function GameView() {
-  const cards_images = ['','','','','','','','','','','','','','','','','','']
+  const imageSources = {
+  0: require('../assets/img/cardsgame/0.png'),
+  1: require('../assets/img/cardsgame/1.png'),
+  2: require('../assets/img/cardsgame/2.png'),
+  3: require('../assets/img/cardsgame/3.png'),
+  4: require('../assets/img/cardsgame/4.png'),
+  5: require('../assets/img/cardsgame/5.png'),
+  6: require('../assets/img/cardsgame/6.png'),
+  7: require('../assets/img/cardsgame/7.png'),
+  8: require('../assets/img/cardsgame/8.png'),
+  9: require('../assets/img/cardsgame/9.png'),
+  10: require('../assets/img/cardsgame/10.png'),
+  11: require('../assets/img/cardsgame/11.png'),
+  12: require('../assets/img/cardsgame/12.png'),
+  13: require('../assets/img/cardsgame/13.png'),
+  14: require('../assets/img/cardsgame/14.png'),
+  15: require('../assets/img/cardsgame/15.png'),
+  16: require('../assets/img/cardsgame/16.png'),
+  17: require('../assets/img/cardsgame/17.png'),
+};
   const { userData } = useAuthUser();
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [userLocal, setUserLocal] = useState(null);
   const [userEnemy, setUserEnemy] = useState(null);
-  const [cardsPlayer, setCardsPlayer] = useState([])
-  const [cardsPlayerOrder, setCardsPlayerOrder] = useState([]) //Que tenga los IDs
+  const [cardsPlayer, setCardsPlayer] = useState([]) //Elegidas van a CardsPlayerOrder
+  const [cardsPlayerSelected, setCardsPlayerOrder] = useState([])
+  const [cardsOrderSent, setCardsOrderSent] = useState(false) //inmovible apenas tenga true
   const [salaEstado, setSalaEstado] = useState(null);
+  const LIMIT_CARDS = 9;
+  const [row1Cards, setRow1Cards] = useState([]); //Para mostrar cartas
+  const [row2Cards, setRow2Cards] = useState([]);
+  const [row3Cards, setRow3Cards] = useState([]);
 
   // --- Lógica de Socket.IO para recibir el estado del juego ---
   useEffect(() => {
@@ -86,10 +110,56 @@ export default function GameView() {
     socket.emit('AVANZAR_RONDA');
   };
 
-  const selectOrderCardIndividual = ()=>
+  const selectOrderCardIndividual = (pos_card)=>
   {
-
+    const card = cardsPlayer[pos_card];
+    const updatedSelectedCards = [...cardsPlayerSelected, card];
+    const updatedCardsPlayer = cardsPlayer.filter((_, idx) => idx !== pos_card);
+    setCardsPlayer(updatedCardsPlayer);
+    setCardsPlayerOrder(updatedSelectedCards);
   }
+
+  const removeOrderCardIndividual = (pos_card)=>
+  {
+    const card = cardsPlayerSelected[pos_card];
+    const updatedCards = [...cardsPlayer, card];
+    const updatedCardsPlayerSelected = cardsPlayerSelected.filter((_, idx) => idx !== pos_card);
+    setCardsPlayer(updatedCards);
+    setCardsPlayerOrder(updatedCardsPlayerSelected);
+  }
+
+/*   useEffect(()=>
+  { 
+    let cont = 0;
+    let rowArray1, rowArray2, rowArray3 = [];
+    let minus = cardsPlayerSelected.length;
+    while(rowArray1.length < 3)
+    {
+      if(cardsPlayerSelected.length > cont) rowArray1.push(cardsPlayerSelected[cont])
+      else rowArray1.push(cardsPlayer[cont - minus])
+      cont++;
+    }
+    while(rowArray2.length < 3)
+    {
+      if(cardsPlayerSelected.length > cont) rowArray2.push(cardsPlayerSelected[cont])
+      else rowArray2.push(cardsPlayer[cont - minus])
+      cont++;
+    }
+    while(rowArray3.length < 3)
+    {
+      if(cardsPlayerSelected.length > cont) rowArray3.push(cardsPlayerSelected[cont])
+      else rowArray3.push(cardsPlayer[cont - minus])
+      cont++;
+    }
+    console.log('Arrays de cartas ordenadas');
+    console.log(rowArray1);
+    console.log(rowArray2);
+    console.log(rowArray3);
+    setRow1Cards([...rowArray1]);
+    setRow2Cards([...rowArray2]);
+    setRow3Cards([...rowArray3]);
+    
+  }, [cardsPlayer, cardsPlayerSelected]) */
 
   useEffect(() => {
       if(salaEstado)
@@ -98,12 +168,19 @@ export default function GameView() {
         console.log(salaEstado);
         setUserLocal(salaEstado.jugadores.find(j => j.id === userData.id));
         setUserEnemy(salaEstado.jugadores.find(j => j.id !== userData.id));
-        console.log("Jugadores seteados");
-        setCardsPlayer(userLocal.cartas)
       }
   }, [salaEstado])
+
+  useEffect(()=>
+  {
+    if(userLocal)
+    {
+      setCardsPlayer(userLocal.cartas)
+    }
+  }, [userLocal])
+
   // Renderizado principal de la pantalla de juego
-  if(!salaEstado || !userLocal || cardsPlayer)
+  if(!salaEstado || !userLocal || !cardsPlayer)
   {
     return(
       <View>
@@ -113,7 +190,7 @@ export default function GameView() {
   }
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Pantalla videojuego - {userData.usuario}</Text>
+      <Text style={styles.title}>Pantalla videojuego - {userData.usuario.usuario}</Text>
       <Text>Estado de la Sala: {salaEstado.estado}</Text>
       <Text>Ronda: {salaEstado.ronda}</Text>
 
@@ -122,16 +199,27 @@ export default function GameView() {
         <View style={styles.playerSection}>
           <Text style={styles.playerName}>Tus Cartas ({cardsPlayer.length}):</Text>
           <View style={styles.cardsContainer}>
-            {cardsPlayer.map(card => (
-              <View>
-                <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text>
-                <Button title="Elegir orden carta" onPress={()=>selectOrderCardIndividual(card.id)} />
-                (card.pos_card && <Text>Orden: {card.pos_card}</Text>)
+            {cardsPlayerSelected.map((card, i) => (
+              <View style={styles.cardContainer}>
+                {/* <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text> */}
+                <View style={styles.selectedCardContainer}>
+                  <Image style={styles.darkCard} source={imageSources[card.id]} />
+                  <Text style={[styles.whiteText, styles.textSelected]}>{i + 1}</Text>
+                </View>
+                <Button title="Eliminar orden" onPress={()=>removeOrderCardIndividual(i)} />
+              </View>
+            ))}
+            {cardsPlayer.map((card, i) => (
+              <View style={styles.cardContainer}>
+                {/* <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text> */}
+                <Image style={styles.imgCard} source={imageSources[card.id]} />
+                <Button title="Elegir orden carta" onPress={()=>selectOrderCardIndividual(i)} />
+                <Text>Sin orden</Text>
               </View>
             ))}
           </View>
-          <Text>Cartas ordenadas: {cardsPlayerOrder ? 'Sí' : 'No'}</Text>
-          {salaEstado.estado === 'esperando-orden' && !cardsPlayerOrder && (
+          <Text>Cartas ordenadas: {cardsPlayerSelected[cardsPlayerSelected.length-1] ? 'Sí' : 'No'}</Text>
+          {salaEstado.estado === 'esperando-orden' && !cardsOrderSent && (
             <Button title="Ordenar Mis Cartas" onPress={handleOrdenarCartas} />
           )}
         </View>
@@ -139,8 +227,7 @@ export default function GameView() {
 
       {userEnemy && (
         <View style={styles.playerSection}>
-          <Text style={styles.playerName}>Cartas de {userEnemy.usuario} ({userEnemy.cartas.length}):</Text>
-          <Text>Ordenadas: {userEnemy.ordenadas ? 'Sí' : 'No'}</Text>
+          <Text style={styles.playerName}>Cartas de {userEnemy.usuario.usuario.usuario} ({userEnemy.cartas.length}):</Text>
         </View>
       )}
 
@@ -151,10 +238,10 @@ export default function GameView() {
       {salaEstado.estado === 'partida-finalizada' && salaEstado.resultado && (
         <View style={styles.resultsSection}>
           <Text style={styles.resultsTitle}>Resultados de la Ronda:</Text>
-          <Text>{userLocal?.usuario}: {salaEstado.resultado[userLocal.id]}</Text>
-          <Text>{userEnemy?.usuario}: {salaEstado.resultado[userEnemy.id]}</Text>
+          <Text>{userLocal.usuario.usuario.usuario} {userLocal.usuario.id === salaEstado.ganador ? " ha ganado" : "ha pedido"}</Text>
+          <Text>{userEnemy.usuario.usuario.usuario} {userEnemy.usuario.id === salaEstado.ganador ? " ha ganado" : "ha pedido"}</Text>
           {salaEstado.ganador && salaEstado.finalizada ? (
-            <Text style={styles.winnerText}>Ganador del Juego: {salaEstado.jugadores.find(j => j.id === salaEstado.ganador)?.usuario}</Text>
+            <Text style={styles.winnerText}>Ganador del Juego: {salaEstado.jugadores.find(j => j.id === salaEstado.ganador)?.usuario.usuario.usuario}</Text>
           ) : (
             <Text style={styles.infoText}>La partida ha finalizado.</Text>
           )}
@@ -211,17 +298,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    alignContent: 'flex-start',
     marginBottom: 10,
+    width: 1500,
+    
+  },
+  cardContainer:
+  {
+    width: 150,
+    padding: 5
+  },
+  selectedCardContainer:
+  {
+    position: "relative",
+    display: "flex",
+    backgroundColor: "#201313",
+    borderRadius: 10
   },
   card: {
     backgroundColor: '#fff',
-    padding: 8,
-    margin: 4,
+    padding: 5,
+    margin: 5,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: '#ccc',
     fontSize: 16,
   },
+  imgCard:
+  {
+    aspectRatio: 4/5,
+    height: "auto",
+    width: "auto",
+    backgroundColor: "#201313"
+  },
+  darkCard:
+  {
+    aspectRatio: 4/5,
+    height: "auto",
+    width: "auto",
+    opacity: 0.5
+  }
+  ,
   resultsSection: {
     marginTop: 30,
     padding: 20,
@@ -247,5 +364,18 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 16,
     marginTop: 10,
+  },
+  whiteText:
+  {
+    color: "#fff"
+  },
+  textSelected:
+  {
+    position: "absolute",
+    fontSize: 30,
+    fontWeight: "700",
+    left: "50%",
+    top: "50%",
+    transform: [{translateX: "-50%"}, {translateY: "-50%"}]
   }
 });
