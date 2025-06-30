@@ -56,6 +56,7 @@ export default function Login() {
       navigation.navigate("Home");
     } catch (e) {
       setIsLoading(false);
+      console.log("no pudo ingresarse al usuario")
       // Mostrar mensaje de error (podés agregar un Toast o mensaje en pantalla)
     }
   };
