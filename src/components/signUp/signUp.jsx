@@ -28,6 +28,12 @@ export default function SignUp() {
   const [confirmarContrasena, setConfirmarContrasena] = useState("");
   const [errores, setErrores] = useState({});
   const [formValido, setFormValido] = useState(false);
+  const [usuarioTocado, setUsuarioTocado] = useState(false);
+  const [emailTocado, setEmailTocado] = useState(false);
+  const [confirmarEmailTocado, setConfirmarEmailTocado] = useState(false);
+  const [contrasenaTocada, setContrasenaTocada] = useState(false);
+  const [confirmarContrasenaTocada, setConfirmarContrasenaTocada] = useState(false);
+
 
   const { apiPostCreateUser } = useApiHooks();
 
@@ -69,7 +75,7 @@ export default function SignUp() {
   const crearCuenta = async () => {
     const esValido = validarFormulario();
     if (!esValido) return;
-    const randomImg = randomUrlsImg[Math.floor(Math.random()* (randomUrlsImg.length + 1))]
+    const randomImg = randomUrlsImg[Math.floor(Math.random() * (randomUrlsImg.length + 1))]
     const data = {
       usuario,
       email,
@@ -97,64 +103,77 @@ export default function SignUp() {
 
       <Text style={estilos.subtitulo}>Crear cuenta</Text>
 
-      <TextInput
-        style={estilos.input}
-        placeholder="Usuario"
-        value={usuario}
-        onChangeText={setUsuario}
-      />
-      {errores.usuario && <Text style={{ color: "red" }}>{errores.usuario}</Text>}
+     <TextInput
+  style={estilos.input}
+  placeholder="Usuario"
+  value={usuario}
+  onChangeText={text => {
+    setUsuario(text);
+    if (!usuarioTocado) setUsuarioTocado(true);
+  }}
+/>
+{errores.usuario && usuarioTocado && (
+  <Text style={{ color: "red" }}>{errores.usuario}</Text>
+)}
 
-      <TextInput
-        style={estilos.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      {errores.email && <Text style={{ color: "red" }}>{errores.email}</Text>}
+<TextInput
+  style={estilos.input}
+  placeholder="Email"
+  value={email}
+  onChangeText={text => {
+    setEmail(text);
+    if (!emailTocado) setEmailTocado(true);
+  }}
+  keyboardType="email-address"
+  autoCapitalize="none"
+/>
+{errores.email && emailTocado && (
+  <Text style={{ color: "red" }}>{errores.email}</Text>
+)}
 
-      <TextInput
-        style={estilos.input}
-        placeholder="Confirmar Email"
-        value={confirmarEmail}
-        onChangeText={setConfirmarEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      {errores.confirmarEmail && (
-        <Text style={{ color: "red" }}>{errores.confirmarEmail}</Text>
-      )}
+<TextInput
+  style={estilos.input}
+  placeholder="Confirmar Email"
+  value={confirmarEmail}
+  onChangeText={text => {
+    setConfirmarEmail(text);
+    if (!confirmarEmailTocado) setConfirmarEmailTocado(true);
+  }}
+  keyboardType="email-address"
+  autoCapitalize="none"
+/>
+{errores.confirmarEmail && confirmarEmailTocado && (
+  <Text style={{ color: "red" }}>{errores.confirmarEmail}</Text>
+)}
 
-      <TextInput
-        style={estilos.input}
-        placeholder="Fecha de nacimiento (DD/MM/AAAA)"
-        value={fechaNacimiento}
-        onChangeText={setFechaNacimiento}
-      />
+<TextInput
+  style={estilos.input}
+  placeholder="Contraseña"
+  value={contrasena}
+  onChangeText={text => {
+    setContrasena(text);
+    if (!contrasenaTocada) setContrasenaTocada(true);
+  }}
+  secureTextEntry
+/>
+{errores.contrasena && contrasenaTocada && (
+  <Text style={{ color: "red" }}>{errores.contrasena}</Text>
+)}
 
-      <TextInput
-        style={estilos.input}
-        placeholder="Contraseña"
-        value={contrasena}
-        onChangeText={setContrasena}
-        secureTextEntry
-      />
-      {errores.contrasena && (
-        <Text style={{ color: "red" }}>{errores.contrasena}</Text>
-      )}
+<TextInput
+  style={estilos.input}
+  placeholder="Confirmar contraseña"
+  value={confirmarContrasena}
+  onChangeText={text => {
+    setConfirmarContrasena(text);
+    if (!confirmarContrasenaTocada) setConfirmarContrasenaTocada(true);
+  }}
+  secureTextEntry
+/>
+{errores.confirmarContrasena && confirmarContrasenaTocada && (
+  <Text style={{ color: "red" }}>{errores.confirmarContrasena}</Text>
+)}
 
-      <TextInput
-        style={estilos.input}
-        placeholder="Confirmar contraseña"
-        value={confirmarContrasena}
-        onChangeText={setConfirmarContrasena}
-        secureTextEntry
-      />
-      {errores.confirmarContrasena && (
-        <Text style={{ color: "red" }}>{errores.confirmarContrasena}</Text>
-      )}
 
       <TouchableOpacity
         style={[
