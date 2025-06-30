@@ -29,10 +29,10 @@ const ApiHooksContext = createContext({
 });
 
 export function ApiHooksProvider({ children }) {
-  const apiBase = API_URL;
-  const apiUsers = API_USERS;
-  const apiRooms = API_CARDS;
-  const apiCards = API_GAME;
+  const apiBase = process.env.EXPO_PUBLIC_API_URL;
+  const apiUsers = process.env.EXPO_PUBLIC_API_USERS;
+  const apiRooms = process.env.EXPO_PUBLIC_API_CARDS;
+  const apiCards = process.env.EXPO_PUBLIC_API_GAME;
 
 
   let responseOk = true;

@@ -8,7 +8,6 @@ import { useNavigation } from "@react-navigation/native";
 import socket from '../src/services/socketService'; // Asegúrate de que esta ruta sea correcta
 import { useAuthUser } from "../hooks/userLogged";
 import { navigate } from "expo-router/build/global-state/routing";
-import { ApiHooksProvider } from "../hooks/apiHooks";
 
 export default function LobbyView() {
 

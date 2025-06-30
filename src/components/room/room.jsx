@@ -4,7 +4,6 @@ import styles from "./styles";
 
 export default function Room(props) {
     const { isPlaying, user1, user2, selectRoom } = props;
-    console.log('PROPS: ', props);
     return (
         <>
             <TouchableOpacity style={styles.boxContainer} onPress={selectRoom}>
