@@ -77,12 +77,18 @@ export function UserLoggedStatusProvider({ children }) {
               setUserData(null);
               setIsUserLogged(false);
           } else {
-              setUserData(decoded);
+              setUserData({
+                  // Asignamos 'id' usando decoded.id si existe, de lo contrario, usamos decoded.usuario
+                  id: decoded.id || decoded.usuario, 
+                  usuario: decoded.usuario,
+                  email: decoded.email,
+                  
+              });
               setIsUserLogged(true);
               // console.log('Ya está iniciado sesión');
           }
         } catch (decodeError) {
-          // Esto captura errores si jwtDecode falla (token malformado, etc.)
+          
           console.error("Error al decodificar el token JWT:", decodeError);
           AsyncStorage.removeData(AUTH_KEY); // Limpiar el token inválido
           setUserToken(null); // Esto causará que este useEffect se ejecute de nuevo con null
@@ -112,7 +118,7 @@ export function UserLoggedStatusProvider({ children }) {
 
       if (response && response.token && typeof response.token === 'string' && response.token.trim() !== '') {
         const receivedToken = response.token;
-
+ //console.log('DEBUG (UserLogged): TOKEN CRUDO RECIBIDO:', receivedToken); // <-- ¡Añade esta línea!
         // Validamos el token recién recibido del servidor antes de guardarlo y usarlo
         if (receivedToken.includes('.') && receivedToken.split('.').length === 3) {
             const decoded = jwtDecode(receivedToken);
