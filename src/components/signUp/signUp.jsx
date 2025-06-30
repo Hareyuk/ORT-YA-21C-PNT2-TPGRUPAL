@@ -75,12 +75,10 @@ export default function SignUp() {
   const crearCuenta = async () => {
     const esValido = validarFormulario();
     if (!esValido) return;
-<<<<<<< HEAD
-    const randomImg = randomUrlsImg[Math.floor(Math.random() * (randomUrlsImg.length + 1))]
-=======
+
     const randomImg = randomUrlsImg[Math.floor(Math.random()* (randomUrlsImg.length + 1))]
     console.log(randomImg);
->>>>>>> 011bbf7660397887af0ec3092e6040621370aaf3
+
     const data = {
       usuario,
       email,
