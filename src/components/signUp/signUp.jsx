@@ -13,12 +13,12 @@ import { useApiHooks } from "../../../hooks/apiHooks.js";
 
 export default function SignUp() {
   const randomUrlsImg = [
-    'https://drive.google.com/u/0/drive-viewer/AKGpihaDxu8kZZPPlPTqqE1_gzvObKo_Ji8_FTHBs_i6SVL0uZ3HVoyzRfy1rhjlaQc9ibAcc4vGWEUcB1BqJv5bWrrfnUmkxS7YU1Y',
-    'https://drive.google.com/u/0/drive-viewer/AKGpihbWk2rcnPmt_ojhmLRcsCfXGaI5zn89Atn6xAfRusZ_goZRJq0Jb5_0B8xidyRIEjvXravylYGMDupYiBrX4ogJFfVLamUWOhU',
-    'https://drive.google.com/u/0/drive-viewer/AKGpihbW2ertni9p_3plDGDaX2nooJEE7Suyli5uLbr4tcuXU-dWnXDlmD2QJp2dPdGgfchh7J5yOwg8_f7-SxbqRgAcxI9AEBR3aBg',
-    'https://drive.google.com/u/0/drive-viewer/AKGpihbHBt7310oIJe-B105mA4nNR3hVA6YP5uaIWVj5vtivygJa27A7aKslpi9Fttd8yTb7vTSHh3g7sLvtjDqVk6jKilaVh58vLpA',
-    'https://drive.google.com/u/0/drive-viewer/AKGpihbHX6vd1lr0rrMViB2HBs2OJzzBKlWvFer8EVntUFQSC-U9Kqqt_DFdVIG_D0t8gV9dd0dXg_qUHZbRP5oycTWLqUfpTMa4hA',
-    'https://drive.google.com/u/0/drive-viewer/AKGpihaowLs5wXBCqNzQCJGn7hmym4YxFVVQcVdxY6Yxc_ucX2qKaHVj7BNbJlAOgWfmjfN2-vwJ5CkP3bzUSLHZtUTMjSqwlhsE0-k'
+    'https://lh3.googleusercontent.com/d/1ydlHT7r6CVDXg5c4Oe9iANmX350sEawy',
+    'https://lh3.googleusercontent.com/d/1r15Oc49pHDdVObz5R5o7kJCZCXQDKztU',
+    'https://lh3.googleusercontent.com/d/1NqxloduuGZUIeriMsaBFS2SoVoSggReZ',
+    'https://lh3.googleusercontent.com/d/1CgbAHsBmh3G3eHUGz4e5vb5EE_4ymoKy',
+    'https://lh3.googleusercontent.com/d/1B_D2HcOoihx6AbKtQ4lDoRCnYffSlT8x',
+    'https://lh3.googleusercontent.com/d/135Gnb9_GS_WExCgDoVWI0qksvYeNChMN'
   ]
   const [usuario, setUsuario] = useState("");
   const [email, setEmail] = useState("");
@@ -70,12 +70,16 @@ export default function SignUp() {
     const esValido = validarFormulario();
     if (!esValido) return;
     const randomImg = randomUrlsImg[Math.floor(Math.random()* (randomUrlsImg.length + 1))]
+    console.log(randomImg);
     const data = {
       usuario,
       email,
       fechaNac: fechaNacimiento,
       contrasenia: contrasena,
-      //pfp: randomImg
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      pfp: randomImg
     };
 
     try {

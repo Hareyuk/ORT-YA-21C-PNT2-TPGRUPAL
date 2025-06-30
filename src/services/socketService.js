@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import {API_URL, API_GAME} from '@env';
+//import {API_URL, API_GAME} from '@env';
 import { useAuthUser } from '../../hooks/userLogged';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;

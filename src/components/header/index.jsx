@@ -60,9 +60,9 @@ export default function Header() {
                             <Pressable onPress={() => handleNavigation('Lobby')}>
                                 <Text style={[styles.whiteText, styles.itemLink]}>Lobby</Text>
                             </Pressable>
-                            <Pressable onPress={() => handleNavigation('Game')}>
+                            {/* <Pressable onPress={() => handleNavigation('Game')}>
                                 <Text style={[styles.whiteText, styles.itemLink]}>Juego</Text>
-                            </Pressable>
+                            </Pressable> */}
                             <Pressable onPress={() => handleNavigation('Profile')}>
                                 <Text style={[styles.whiteText, styles.itemLink]}>Perfil</Text>
                             </Pressable>

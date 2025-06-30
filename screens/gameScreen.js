@@ -150,39 +150,6 @@ export default function GameView() {
     setOrderedCards(updatedCardsPlayerSelected);
   }
 
-/*   useEffect(()=>
-  { 
-    let cont = 0;
-    let rowArray1, rowArray2, rowArray3 = [];
-    let minus = cardsPlayerSelected.length;
-    while(rowArray1.length < 3)
-    {
-      if(cardsPlayerSelected.length > cont) rowArray1.push(cardsPlayerSelected[cont])
-      else rowArray1.push(cardsPlayer[cont - minus])
-      cont++;
-    }
-    while(rowArray2.length < 3)
-    {
-      if(cardsPlayerSelected.length > cont) rowArray2.push(cardsPlayerSelected[cont])
-      else rowArray2.push(cardsPlayer[cont - minus])
-      cont++;
-    }
-    while(rowArray3.length < 3)
-    {
-      if(cardsPlayerSelected.length > cont) rowArray3.push(cardsPlayerSelected[cont])
-      else rowArray3.push(cardsPlayer[cont - minus])
-      cont++;
-    }
-    console.log('Arrays de cartas ordenadas');
-    console.log(rowArray1);
-    console.log(rowArray2);
-    console.log(rowArray3);
-    setRow1Cards([...rowArray1]);
-    setRow2Cards([...rowArray2]);
-    setRow3Cards([...rowArray3]);
-    
-  }, [cardsPlayer, cardsPlayerSelected]) */
-
   useEffect(() => {
       if(salaEstado)
       {
@@ -235,8 +202,8 @@ export default function GameView() {
               <View style={styles.cardContainer}>
                 {/* <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text> */}
                 <Image style={styles.imgCard} source={imageSources[card.id]} />
-                <Button title="Elegir orden carta" onPress={()=>selectOrderCardIndividual(i)} />
-                <Text>Sin orden</Text>
+                <Button title="Seleccionar" onPress={()=>selectOrderCardIndividual(i)} />
+                {/* <Text>Sin orden</Text> */}
               </View>
             ))}
           </View>
