@@ -1,11 +1,14 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
 import estilos from "./estiloProfile";
+import { useAuthUser } from "../../../hooks/userLogged";
 
 export default function ProfileCenter() {
-  const usuario = "MiUsuario";
-  const victorias = "--";
-  const derrotas = "--";
+  const {userData} = useAuthUser();
+  const foto = userData.pfp;
+  const usuario = userData.usuario;
+  const victorias = userData.wins;
+  const derrotas = userData.losses;
 
   return (
     <View style={estilos.row}>
@@ -13,10 +16,10 @@ export default function ProfileCenter() {
       <View style={estilos.left}>
         <Text style={estilos.titulo}>Mi perfil</Text>
         <Image
-          source={require("../../../assets/icon.png")}
+          source={foto}
           style={estilos.avatar}
         />
-        <Text style={estilos.infoText}>Usuario  {usuario}</Text>
+        <Text style={estilos.infoText}>{usuario}</Text>
         <Text style={estilos.infoText}>
           Victorias: {victorias}{"\n"}Derrotas: {derrotas}
         </Text>

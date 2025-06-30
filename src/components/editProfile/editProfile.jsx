@@ -28,12 +28,11 @@ export default function EditProfile({ navigation }) {
 
   useEffect(() => {
     if (isUserLogged && userData) {
-
-      setUsuario(userData.usuario || "");
+      //setUsuario(userData.usuario || "");
       setNewEmail(userData.email || "");
     } else {
 
-      setUsuario("");
+      //setUsuario("");
       setNewEmail("");
       setNewPassword("");
       setConfirmPassword("");
@@ -56,9 +55,9 @@ export default function EditProfile({ navigation }) {
     const regexContrasena = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}$/; //igual que en el back
 
     // Validar USUARIO (si se ingresó y es diferente al actual)
-    if (usuario.trim() !== "" && usuario.trim().length < 5) {
+    /* if (usuario.trim() !== "" && usuario.trim().length < 5) {
       nuevosErrores.usuario = "El usuario debe tener al menos 5 caracteres (si se modifica).";
-    }
+    } */
 
     // Validar EMAIL (si se ingresó y es diferente al actual)
     if (newEmail.trim() !== "" && !regexEmail.test(newEmail)) {
@@ -214,10 +213,11 @@ if (isLoadingAuth) {
               style={estilos.avatar}
             />
             <TextInput
+              disabled
               style={estilos.input}
-              placeholder="Nuevo nombre de usuario" // Añadido para que el usuario pueda cambiarlo
+              placeholder={usuario} 
               value={usuario}
-              onChangeText={setUsuario}
+              /* onChangeText={setUsuario} */
               autoCapitalize="none"
             />
             {errores.usuario && <Text style={{ color: "red" }}>{errores.usuario}</Text>}
