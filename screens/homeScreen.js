@@ -28,8 +28,28 @@ export default function Home() {
     id:"3",
     text: "papel",
     src: require("../assets/img/card_preview_3.jpg")
-  }];
-    
+  }]; 
+  
+  const imageCardsArray = [
+  { id: 'cd01', src: require('../assets/img/cardsgame/0.png') },
+  { id: 'cd02', src: require('../assets/img/cardsgame/1.png') },
+  { id: 'cd03', src: require('../assets/img/cardsgame/2.png') },
+  { id: 'cd04', src: require('../assets/img/cardsgame/3.png') },
+  { id: 'cd05', src: require('../assets/img/cardsgame/4.png') },
+  { id: 'cd06', src: require('../assets/img/cardsgame/5.png') },
+  { id: 'cd07', src: require('../assets/img/cardsgame/6.png') },
+  { id: 'cd08', src: require('../assets/img/cardsgame/7.png') },
+  { id: 'cd09', src: require('../assets/img/cardsgame/8.png') },
+  { id: 'cd10', src: require('../assets/img/cardsgame/9.png') },
+  { id: 'cd11', src: require('../assets/img/cardsgame/10.png') },
+  { id: 'cd12', src: require('../assets/img/cardsgame/11.png') },
+  { id: 'cd13', src: require('../assets/img/cardsgame/12.png') },
+  { id: 'cd14', src: require('../assets/img/cardsgame/13.png') },
+  { id: 'cd15', src: require('../assets/img/cardsgame/14.png') },
+  { id: 'cd16', src: require('../assets/img/cardsgame/15.png') },
+  { id: 'cd17', src: require('../assets/img/cardsgame/16.png') },
+  { id: 'cd18', src: require('../assets/img/cardsgame/17.png') },
+];
   const previewCardHTML = (id, text, src)=>{
     return(
     <View style={styles.containerCardPreview} key={id}>
@@ -38,6 +58,17 @@ export default function Home() {
           source={src}
         />
         <Text style={styles.cardPreviewText}>{text}</Text>
+      </View>
+      );
+  }
+
+  const previewCardGameHTML = (obj)=>{
+    return(
+    <View style={styles.containerCardGamePreview} key={`cg${obj.id}`}>
+        <Image
+          style={styles.cardGamePreview}
+          source={obj.src}
+        />
       </View>
       );
   }
@@ -79,7 +110,9 @@ export default function Home() {
           </View>
         </View>
         <View style={styles.sectionGalleryCards}>
-          <Text>Las 10 cartas</Text>
+          <View style={styles.containerPvCardsGame}>
+            {imageCardsArray.map((obj)=>previewCardGameHTML(obj))}
+          </View>
         </View>
       </ScrollView>
     </View>
@@ -163,6 +196,36 @@ const styles = StyleSheet.create({
     width: "25%",
     display: "flex",
     flexDirection: "column",
+  },
+  sectionGalleryCards:
+  {
+    display: "flex",
+    padding: 20,
+    backgroundColor: "#130e0c",
+    width: "100%",
+    maxWidth: "1920px"
+  },
+  containerPvCardsGame:
+  {
+    width: "80%",
+    display: "flex",
+    flexDirection: "row",
+    alignSelf: "center",
+    flexWrap: "wrap",
+    justifyContent: "space-evenly",
+    gap: 12
+  },
+  containerCardGamePreview:
+  {
+    display: "flex",
+    width: "10%",
+    height: "auto",
+  },
+  cardGamePreview:
+  {
+    width: "100%",
+    aspectRatio: 4/5,
+    height: "auto",
   },
   cardPreview:
   {

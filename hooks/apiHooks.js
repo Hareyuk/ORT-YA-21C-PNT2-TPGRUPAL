@@ -1,15 +1,10 @@
 import { useContext, createContext } from "react";
-//import { API_URL, API_CARDS, API_GAME, API_USERS } from '@env';
-
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const API_CARDS = process.env.EXPO_PUBLIC_API_CARDS;
 
 const API_GAME = process.env.EXPO_PUBLIC_API_GAME;
 const API_USERS = process.env.EXPO_PUBLIC_API_USERS;
-
-console.log("DEBUG (process.env): API_URL:", API_URL); // ¡Mantén este log!
-console.log("DEBUG (process.env): API_USERS:", API_USERS)
 
 const ApiHooksContext = createContext({
   //API ROOMS

@@ -20,6 +20,9 @@ export default function Login() {
   const [errores, setErrores] = useState({});
   const [formValido, setFormValido] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [usuarioTocado, setUsuarioTocado] = useState(false);
+  const [contrasenaTocada, setContrasenaTocada] = useState(false);
+
 
   const { logInUser } = useAuthUser();
 
@@ -76,25 +79,34 @@ export default function Login() {
         style={estilos.input}
         placeholder="Usuario"
         value={usuario}
-        onChangeText={setUsuario}
+        onChangeText={text => {
+          setUsuario(text);
+          if (!usuarioTocado) setUsuarioTocado(true);
+        }}
         textContentType="username"
         autoComplete="username"
       />
-      {errores.usuario && <Text style={{ color: "red" }}>{errores.usuario}</Text>}
+      {errores.usuario && usuarioTocado && (
+        <Text style={{ color: "red" }}>{errores.usuario}</Text>
+      )}
 
       <TextInput
         style={estilos.input}
         placeholder="Contraseña"
         type="password"
         value={contrasena}
-        onChangeText={setContrasena}
+        onChangeText={text => {
+          setContrasena(text);
+          if (!contrasenaTocada) setContrasenaTocada(true);
+        }}
         textContentType="password"
         autoComplete="password"
         secureTextEntry
       />
-      {errores.contrasena && (
+      {errores.contrasena && contrasenaTocada && (
         <Text style={{ color: "red" }}>{errores.contrasena}</Text>
       )}
+
 
       <TouchableOpacity
         style={[
