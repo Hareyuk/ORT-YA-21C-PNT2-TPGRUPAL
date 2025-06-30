@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import socket from '../src/services/socketService'; // Asegúrate de que esta ruta sea correcta
 import { useAuthUser } from "../hooks/userLogged";
 import LoadingScreen from "../src/components/loading/loading";
+import { ApiHooksProvider } from "../hooks/apiHooks";
 export default function GameView() {
   const imageSources = {
   0: require('../assets/img/cardsgame/0.png'),
@@ -31,15 +32,11 @@ export default function GameView() {
   const [isLoading, setIsLoading] = useState(false);
   const [userLocal, setUserLocal] = useState(null);
   const [userEnemy, setUserEnemy] = useState(null);
-  const [cardsPlayer, setCardsPlayer] = useState([]) //Elegidas van a CardsPlayerOrder
-  const [cardsPlayerSelected, setCardsPlayerOrder] = useState([])
-  const [cardsOrderSent, setCardsOrderSent] = useState(false) //inmovible apenas tenga true
+  const [availableCards, setAvailableCards] = useState([]) //Elegidas van a CardsPlayerOrder
+  const [orderedCards, setOrderedCards] = useState([])
+  const [hasSubmittedOrder, setHasSubmittedOrder] = useState(false) //inmovible apenas tenga true
   const [salaEstado, setSalaEstado] = useState(null);
-  const LIMIT_CARDS = 9;
-  const [row1Cards, setRow1Cards] = useState([]); //Para mostrar cartas
-  const [row2Cards, setRow2Cards] = useState([]);
-  const [row3Cards, setRow3Cards] = useState([]);
-
+  
   // --- Lógica de Socket.IO para recibir el estado del juego ---
   useEffect(() => {
     
@@ -110,22 +107,47 @@ export default function GameView() {
     socket.emit('AVANZAR_RONDA');
   };
 
+  //https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+  const getShuffledArr = arr => {
+    const newArr = arr.slice()
+    for (let i = newArr.length - 1; i > 0; i--) {
+        const rand = Math.floor(Math.random() * (i + 1));
+        [newArr[i], newArr[rand]] = [newArr[rand], newArr[i]];
+    }
+    return newArr
+};
+
+  const generateRandomOrder = ()=>
+  {
+    const fullArray = [...availableCards, ...orderedCards];
+    const shuffled = getShuffledArr(fullArray);
+    setAvailableCards([]);
+    setOrderedCards(shuffled);
+  }
+
+  const sendOrderCards = ()=>
+  {
+    socket.emit('ORDENAR_CARTAS', { id: userData.id, nuevoOrden: orderedCards });
+    setHasSubmittedOrder(true);
+    setIsLoading(true);
+  }
+
   const selectOrderCardIndividual = (pos_card)=>
   {
-    const card = cardsPlayer[pos_card];
-    const updatedSelectedCards = [...cardsPlayerSelected, card];
-    const updatedCardsPlayer = cardsPlayer.filter((_, idx) => idx !== pos_card);
-    setCardsPlayer(updatedCardsPlayer);
-    setCardsPlayerOrder(updatedSelectedCards);
+    const card = availableCards[pos_card];
+    const updatedSelectedCards = [...orderedCards, card];
+    const updatedCardsPlayer = availableCards.filter((_, idx) => idx !== pos_card);
+    setAvailableCards(updatedCardsPlayer);
+    setOrderedCards(updatedSelectedCards);
   }
 
   const removeOrderCardIndividual = (pos_card)=>
   {
-    const card = cardsPlayerSelected[pos_card];
-    const updatedCards = [...cardsPlayer, card];
-    const updatedCardsPlayerSelected = cardsPlayerSelected.filter((_, idx) => idx !== pos_card);
-    setCardsPlayer(updatedCards);
-    setCardsPlayerOrder(updatedCardsPlayerSelected);
+    const card = orderedCards[pos_card];
+    const updatedCards = [...availableCards, card];
+    const updatedCardsPlayerSelected = orderedCards.filter((_, idx) => idx !== pos_card);
+    setAvailableCards(updatedCards);
+    setOrderedCards(updatedCardsPlayerSelected);
   }
 
 /*   useEffect(()=>
@@ -175,12 +197,12 @@ export default function GameView() {
   {
     if(userLocal)
     {
-      setCardsPlayer(userLocal.cartas)
+      setAvailableCards(userLocal.cartas)
     }
   }, [userLocal])
 
   // Renderizado principal de la pantalla de juego
-  if(!salaEstado || !userLocal || !cardsPlayer)
+  if(!salaEstado || !userLocal || !availableCards)
   {
     return(
       <View>
@@ -197,9 +219,9 @@ export default function GameView() {
       {salaEstado.jugadores.length < 2 && <Text>Esperando más jugadores...</Text>}
       {userLocal && (
         <View style={styles.playerSection}>
-          <Text style={styles.playerName}>Tus Cartas ({cardsPlayer.length}):</Text>
+          <Text style={styles.playerName}>Tus Cartas ({availableCards.length}):</Text>
           <View style={styles.cardsContainer}>
-            {cardsPlayerSelected.map((card, i) => (
+            {orderedCards.map((card, i) => (
               <View style={styles.cardContainer}>
                 {/* <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text> */}
                 <View style={styles.selectedCardContainer}>
@@ -209,7 +231,7 @@ export default function GameView() {
                 <Button title="Eliminar orden" onPress={()=>removeOrderCardIndividual(i)} />
               </View>
             ))}
-            {cardsPlayer.map((card, i) => (
+            {availableCards.map((card, i) => (
               <View style={styles.cardContainer}>
                 {/* <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text> */}
                 <Image style={styles.imgCard} source={imageSources[card.id]} />
@@ -218,9 +240,12 @@ export default function GameView() {
               </View>
             ))}
           </View>
-          <Text>Cartas ordenadas: {cardsPlayerSelected[cardsPlayerSelected.length-1] ? 'Sí' : 'No'}</Text>
-          {salaEstado.estado === 'esperando-orden' && !cardsOrderSent && (
-            <Button title="Ordenar Mis Cartas" onPress={handleOrdenarCartas} />
+          <Text>Cartas ordenadas: {orderedCards[orderedCards.length-1] ? 'Sí' : 'No'}</Text>
+          <Button title="Ordernar aleatoriamente" onPress={generateRandomOrder} />
+          {(orderedCards.length == 9 && !hasSubmittedOrder) ? (
+              <Button title="Aceptar orden de cartas" onPress={sendOrderCards} />
+          ) : (
+            <Button title="Aceptar orden de cartas" disabled />
           )}
         </View>
       )}
