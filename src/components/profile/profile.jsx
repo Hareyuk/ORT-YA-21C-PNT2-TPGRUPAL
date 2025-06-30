@@ -16,7 +16,7 @@ export default function ProfileCenter() {
           source={require("../../../assets/icon.png")}
           style={estilos.avatar}
         />
-        <Text style={estilos.infoText}>Usuario – {usuario}</Text>
+        <Text style={estilos.infoText}>Usuario  {usuario}</Text>
         <Text style={estilos.infoText}>
           Victorias: {victorias}{"\n"}Derrotas: {derrotas}
         </Text>

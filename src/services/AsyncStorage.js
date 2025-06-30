@@ -20,7 +20,7 @@ const storeData = async (key, value) => {
 
 const getData = async (key) => {
   try {
-    const value = await AsyncStorage.getItem(key).then(value=>{return value});
+    let value = await AsyncStorage.getItem(key).then(value=>{return value});
     //Decodificar JSON si es un objeto recibido
     if(typeof value === 'object')
     {

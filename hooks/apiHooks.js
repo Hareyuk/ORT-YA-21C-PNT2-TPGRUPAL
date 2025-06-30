@@ -1,5 +1,15 @@
 import { useContext, createContext } from "react";
-import { API_URL, API_CARDS, API_GAME, API_USERS } from '@env';
+//import { API_URL, API_CARDS, API_GAME, API_USERS } from '@env';
+
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+const API_CARDS = process.env.EXPO_PUBLIC_API_CARDS;
+
+const API_GAME = process.env.EXPO_PUBLIC_API_GAME;
+const API_USERS = process.env.EXPO_PUBLIC_API_USERS;
+
+console.log("DEBUG (process.env): API_URL:", API_URL); // ¡Mantén este log!
+console.log("DEBUG (process.env): API_USERS:", API_USERS)
 
 const ApiHooksContext = createContext({
   //API ROOMS
@@ -29,8 +39,10 @@ export function ApiHooksProvider({ children }) {
   const apiUrl = apiBase + apiUsers;
 
   // Helper for POST/PUT requests with JSON body
-  const fetchJson = async (url, method, bodyObj) => {
-    let responseOk = true;
+  const fetchJson = async (endpointPath, method, bodyObj) => {
+    const url = `${apiBase}${endpointPath}`;
+    console.log(url)
+    //let responseOk = true;
     console.log(`[fetchJson] Intentando ${method} a URL: ${url}`);
     try {
       const res = await fetch(url, {
@@ -39,93 +51,142 @@ export function ApiHooksProvider({ children }) {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify(bodyObj),
+        body: bodyObj ? JSON.stringify(bodyObj) : undefined,
       });
       if (!res.ok) {
-        responseOk = false;
-        const errorData = await res.text();
-        console.error('Server error:', {
-          status: errorData.status,
-          statusText: errorData.statusText,
-          error: errorData
+        //responseOk = false;
+        let errorData = null;
+        try {
+       const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            errorData = await res.json();
+          } else {
+            errorData = await res.text();
+          }
+        } catch (parseError) {
+          errorData = `Error al parsear la respuesta de error: ${parseError.message}. Contenido: ${await res.text()}`;
+        }
+        console.error('Server error (fetchJson):', {
+          status: res.status,
+          statusText: res.statusText,
+          url: res.url,
+          responseBody: errorData,
         });
-        throw new Error(`HTTP error! status: ${res.status}`);
+
+        throw new Error(`HTTP error! Status: ${res.status}. Message: ${JSON.stringify(errorData)}`);
       }
-      else
-      {
-        const data = await res.json();
-        responseOk = data;
-        //console.log('Success response:', data);
-      }
-      return responseOk;
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return await res.json();
+      } else {
+     
+       console.warn(`[fetchJson] Respuesta OK (${res.status}) pero no es JSON. URL: ${url}`);
+        return {};
+      } 
+      
     } catch (e) {
-      responseOk = false;
-      throw new Error("ERROR: " + e.message);
+       console.error('[fetchJson] Error en la solicitud:', e.message);
+      throw new Error("ERROR de red o procesamiento: " + e.message);
     }
   };
 
   // Helper for GET requests
-  const fetchGet = async (url) => {
+  const fetchGet = async (endpointPath) => {
+    const url = `${apiBase}${endpointPath}`;
     try {
       const res = await fetch(url, { method: 'GET' });
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      return res;
+      if (!res.ok) {
+        let errorData = null;
+        try {
+          const contentType = res.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            errorData = await res.json();
+          } else {
+            errorData = await res.text();
+          }
+        } catch (parseError) {
+          errorData = `Error al parsear la respuesta de error GET: ${parseError.message}. Contenido: ${await res.text()}`;
+        }
+        console.error('Server error (fetchGet):', {
+          status: res.status,
+          statusText: res.statusText,
+          url: res.url,
+          responseBody: errorData,
+        });
+        throw new Error(`HTTP error! Status: ${res.status}. Message: ${JSON.stringify(errorData)}`);
+      }
+
+      const contentType = res.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        return await res.json();
+      } else {
+        // Si no es JSON, por ejemplo, un 204 No Content
+        console.warn(`[fetchGet] Respuesta OK (${res.status}) pero no es JSON. URL: ${url}`);
+        return {};
+      }
     } catch (e) {
-      throw new Error("ERROR: " + e.message);
+      console.error('[fetchGet] Error en la solicitud GET:', e.message);
+      throw new Error("ERROR de red o procesamiento GET: " + e.message);
     }
   };
 
-  // API ROOMS
+
+
+// API ROOMS 
   const apiJoinRoom = async (id, user) => {
-    return fetchJson(apiBase + apiRooms + "/unirse", 'POST', {
+    return fetchJson(`${apiCards}/unirse`, 'POST', {
       id,
       usuario: user,
     });
   };
 
   const apiSendSelectedOrderCards = async (id, orderCards) => {
-    return fetchJson(apiBase + apiRooms + "/ordenar", 'POST', {
+    return fetchJson(`${apiCards}/ordenar`, 'POST', {
       id,
       nuevoOrden: orderCards,
     });
   };
 
   const apiPlayRound = async () => {
-    return fetchJson(apiBase + apiRooms + "/jugar", 'POST', {});
+    return fetchJson(`${apiCards}/jugar`, 'POST', {});
   };
 
   const apiPlayNextRound = async () => {
-    return fetchJson(apiBase + apiRooms + "/siguiente", 'POST', {});
+    return fetchJson(`${apiCards}/siguiente`, 'POST', {});
   };
 
   const apiGetRoom = async () => {
-    return fetchGet(apiBase + apiRooms + "/sala");
+    return fetchGet(`${apiCards}/sala`);
   };
 
   // API USERS
   const apiGetUserById = async (id) => {
-    return fetchGet(apiBase + apiUsers + `/${id}`);
+    return fetchGet(`${apiUsers}/${id}`);
   };
 
   const apiGetUsers = async () => {
-    return fetchGet(apiBase + apiUsers);
+    return fetchGet(apiUsersPath); // Aquí si la ruta base es solo /api/usuarios
   };
 
   const apiPostLoginuser = async (formData) => {
-    return fetchJson(apiBase + apiUsers + `/login`, 'POST', formData);
+    // Aquí el endpoint es /login, y fetchJson le añade apiBase + apiUsersPath
+    return fetchJson(`${apiUsers}/login`, 'POST', formData);
   };
 
   const apiPostCreateUser = async (formData) => {
-    return fetchJson(apiBase + apiUsers, 'POST', formData);
+    return fetchJson(apiUsers, 'POST', formData);
   };
 
   const apiPutUpdateUser = async (id, formData) => {
-    return fetchJson(apiBase + apiUsers + `/${id}`, 'PUT', formData);
+    
+    return fetchJson(`${apiUsers}/${id}`, 'PUT', formData);
   };
 
   const apiDeleteUser = async (id) => {
-    return fetchJson(apiBase + apiUsers + `/${id}`, 'DELETE', {});
+    return fetchJson(`${apiUsers}/${id}`, 'DELETE', {});
   };
+
+  
 
   const value = {
     //API ROOMS
