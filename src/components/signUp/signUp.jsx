@@ -123,6 +123,13 @@ export default function SignUp() {
 )}
 
 <TextInput
+        style={estilos.input}
+        placeholder="Fecha de nacimiento (MM/DD/AAAA)"
+        value={fechaNacimiento}
+        onChangeText={setFechaNacimiento}
+      />
+
+<TextInput
   style={estilos.input}
   placeholder="Email"
   value={email}

@@ -2,8 +2,10 @@ import React from "react";
 import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
 import estilos from "./estiloProfile";
 import { useAuthUser } from "../../../hooks/userLogged";
+import { useNavigation } from "@react-navigation/native";
 
 export default function ProfileCenter() {
+  const navigation = useNavigation();
   const {userData} = useAuthUser();
   const foto = userData.pfp;
   const usuario = userData.usuario;
@@ -23,7 +25,7 @@ export default function ProfileCenter() {
         <Text style={estilos.infoText}>
           Victorias: {victorias}{"\n"}Derrotas: {derrotas}
         </Text>
-        <TouchableOpacity style={estilos.boton}>
+        <TouchableOpacity style={estilos.boton} onPress={()=>navigation.navigate("EditProfile")}>
           <Text style={estilos.textoBoton}>Editar perfil</Text>
         </TouchableOpacity>
       </View>

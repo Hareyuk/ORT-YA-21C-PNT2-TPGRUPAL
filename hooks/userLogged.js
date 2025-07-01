@@ -82,7 +82,10 @@ export function UserLoggedStatusProvider({ children }) {
                   id: decoded.id || decoded.usuario, 
                   usuario: decoded.usuario,
                   email: decoded.email,
-                  
+                  pfp: decoded.pfp,
+                  wins: decoded.wins,
+                  losses: decoded.losses,
+                  draws: decoded.draws
               });
               setIsUserLogged(true);
               // console.log('Ya está iniciado sesión');

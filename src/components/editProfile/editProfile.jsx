@@ -15,15 +15,14 @@ import { useAuthUser } from "../../../hooks/userLogged.js";
 import estilos from "./estiloEditProfile";
 
 export default function EditProfile({ navigation }) {
-
   const { userData, userToken, isUserLogged, isLoadingAuth, logOutUser } = useAuthUser();
-  const [usuario, setUsuario] = useState("");
+  const [usuario, setUsuario] = useState(userData.usuario);
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errores, setErrores] = useState({});
   const [formValido, setFormValido] = useState(false);
-
+  const [userPfp, setUserPfp] = useState(userData.pfp)
   const { apiPutUpdateUser, apiDeleteUser } = useApiHooks();
 
   useEffect(() => {
@@ -129,7 +128,7 @@ export default function EditProfile({ navigation }) {
 
       if (response) {
         Alert.alert("Perfil actualizado correctamente.");
-        navigation.navigate('Home')
+        navigation.navigate('Profile')
         setNewPassword("");
         setConfirmPassword("");
         setErrores({});
@@ -209,7 +208,7 @@ if (isLoadingAuth) {
           <View style={estilos.left}>
             <Text style={estilos.titulo}>Editar perfil</Text>
             <Image
-              source={require("../../../assets/icon.png")}
+              source={userPfp}
               style={estilos.avatar}
             />
             <TextInput

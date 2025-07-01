@@ -35,7 +35,10 @@ export default function GameView() {
   const [availableCards, setAvailableCards] = useState([]) //Elegidas van a CardsPlayerOrder
   const [orderedCards, setOrderedCards] = useState([])
   const [hasSubmittedOrder, setHasSubmittedOrder] = useState(false) //inmovible apenas tenga true
-  const [salaEstado, setSalaEstado] = useState(null);
+  const [duelFinished, setDuelFinished] = useState(false)
+  const [salaEstado, setSalaEstado] = useState(null)
+  const [cardsPlayerLocal, setCardsPlayerLocal] = useState(null)
+  const [cardsPlayerEnemy, setCardsPlayerEnemy] = useState(null)
   
   // --- Lógica de Socket.IO para recibir el estado del juego ---
   useEffect(() => {
@@ -43,6 +46,29 @@ export default function GameView() {
       // Ahora sí pide al armarse este emit de recibir sala 
     socket.emit('SOLICITAR_SALA_INICIAL');
 
+    socket.on('BATALLA_RONDA',(room)=>
+    {
+      if(room.estado === "cartas-ordenadas")
+      {
+        console.log('QUE EMPIECE EL ENFRENTAMIENTO DE CARTAS');
+        const local = room.jugadores.find(j => j.id === userData.id);
+        const enemy = room.jugadores.find(j => j.id !== userData.id);
+        setCardsPlayerLocal(local.cartas)
+        setCardsPlayerEnemy(enemy.cartas)
+        setSalaEstado(room);
+        console.log('cartas de jugador loca: ', local.cartas);
+        setIsLoading(false);
+      }
+      else
+      {
+        console.log('Falta un jugador todavía');
+      }
+    })
+
+    socket.on('FIN_DE_PARTIDA', ()=>
+    {
+      console.log('Terminó partida, a irse bye');
+    })
     // Escuchar el estado de la sala actualizado
     socket.on('ESTADO_SALA_ACTUALIZADO', (sala) => {
       console.log('GameView - Estado de la sala actualizado:', sala);
@@ -61,6 +87,8 @@ export default function GameView() {
         setTimeout(() => navigation.replace('Lobby'), 3000);
       }
     });
+
+    socket.on()
 
     // Manejar errores que el backend envíe por socket
     socket.on('ERROR', (error) => {
@@ -88,7 +116,7 @@ export default function GameView() {
     // Esto es solo un placeholder: deberías obtener el orden real de tus cartas en la UI.
     //const nuevoOrden = [...jugadorActual.cartas].sort(() => Math.random() - 0.5).map(c => c.id);
     console.log(`[GameView] Enviando ORDENAR_CARTAS para ${userData.id}:`, nuevoOrden);
-    socket.emit('ORDENAR_CARTAS', { id: userData.id, nuevoOrden: nuevoOrden });
+    socket.emit('ORDENAR_CARTAS', { id: userData.id, nuevoOrden: orderedCards });
   };
 
   const handleEnfrentarCartas = () => {
@@ -127,9 +155,12 @@ export default function GameView() {
 
   const sendOrderCards = ()=>
   {
-    socket.emit('ORDENAR_CARTAS', { id: userData.id, nuevoOrden: orderedCards });
-    setHasSubmittedOrder(true);
     setIsLoading(true);
+    console.log("ENVIAR CARTAS");
+    console.log("ID: ", userData.id);
+    console.log("nuevoOrden: ", orderedCards);
+    setHasSubmittedOrder(true);
+    socket.emit('CARTAS_ORDENADAS_ENVIADO', { id: userData.id, nuevoOrden: orderedCards });
   }
 
   const selectOrderCardIndividual = (pos_card)=>
@@ -153,8 +184,8 @@ export default function GameView() {
   useEffect(() => {
       if(salaEstado)
       {
-        console.log("LOG ESTADO:");
-        console.log(salaEstado);
+        /* console.log("LOG ESTADO:");
+        console.log(salaEstado); */
         setUserLocal(salaEstado.jugadores.find(j => j.id === userData.id));
         setUserEnemy(salaEstado.jugadores.find(j => j.id !== userData.id));
       }
@@ -167,6 +198,106 @@ export default function GameView() {
       setAvailableCards(userLocal.cartas)
     }
   }, [userLocal])
+
+  const renderResultsRound=()=>
+  {
+    if(cardsPlayerEnemy == null)
+    return (<></>);
+
+    return(
+      <>
+        <View style={styles.playerSection}>
+            <Text style={styles.textInfo}>¡Enfrentamiento!</Text>
+            <Text style={styles.textInfo}>Ronda {salaEstado.ronda}</Text>
+            {/* Render enemy cards */}
+            <View style={styles.cardsPlayerContainer}>
+              <Text style={styles.playerName}>{userEnemy.usuario.usuario.usuario}</Text>
+              <View style={styles.cardsContainer}>
+                {cardsPlayerEnemy.map((card, i) => (
+                  <View key={`cards-enemy-${i}`} style={styles.cardContainer}>
+                    <View style={styles.selectedCardContainer}>
+                      <Image style={styles.imgCard} source={imageSources[card.id]} />
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </View>
+            {/* Render results */}
+            <View style={styles.cardsPlayerContainer}>
+              <Text style={styles.playerName}>{userEnemy.usuario.usuario.usuario}</Text>
+              <View style={styles.cardsContainer}>
+                {cardsPlayerEnemy.map((card, i) => (
+                  <View key={`cards-enemy-${i}`} style={styles.cardContainer}>
+                    <View style={styles.selectedCardContainer}>
+                      <Image style={styles.imgCard} source={imageSources[card.id]} />
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </View>
+            {/* Render local player cards */}
+            <View style={styles.cardsPlayerContainer}>
+              <View style={styles.cardsContainer}>
+                {cardsPlayerLocal.map((card, i) => (
+                  <View key={`cards-local-${i}`} style={styles.cardContainer}>
+                    <View style={styles.selectedCardContainer}>
+                      <Image style={styles.imgCard} source={imageSources[card.id]} />
+                    </View>
+                  </View>
+                ))}
+              </View>
+              <Text style={styles.playerName}>{userLocal.usuario.usuario.usuario}</Text>
+            </View>
+          </View>
+      </>
+    )
+  }
+
+  const renderPlayingGame=()=>
+  {
+    if(!userEnemy || cardsPlayerLocal != null)
+    return(<></>)
+    
+    return(
+      <>
+        <View style={styles.playerSection}>
+          <Text style={styles.playerName}>Cartas de {userEnemy.usuario.usuario.usuario} ({userEnemy.cartas.length}):</Text>
+        </View>
+        <View style={styles.playerSection}>
+          <Text style={styles.playerName}>Tus Cartas ({availableCards.length}):</Text>
+          <View style={styles.cardsContainer}>
+            {orderedCards.length > 0 && orderedCards.map((card, i) => (
+              <View key={`key-cards-${i}`} style={styles.cardContainer}>
+                {/* <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text> */}
+                <View style={styles.selectedCardContainer}>
+                  <Image style={styles.darkCard} source={imageSources[card.id]} />
+                  <Text style={[styles.whiteText, styles.textSelected]}>{i + 1}</Text>
+                </View>
+                <Button title="Eliminar orden" onPress={()=>removeOrderCardIndividual(i)} />
+              </View>
+            ))}
+            {availableCards.length > 0 && availableCards.map((card, i) => (
+              <>
+                <View key={`available-cards-${i}`} style={styles.cardContainer}>
+                  {/* <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text> */}
+                  <Image style={styles.imgCard} source={imageSources[card.id]} />
+                  <Button title="Seleccionar" onPress={()=>selectOrderCardIndividual(i)} />
+                  {/* <Text>Sin orden</Text> */}
+                </View>
+              </>
+            ))}
+          </View>
+          <Text>Cartas ordenadas: {orderedCards[orderedCards.length-1] ? 'Sí' : 'No'}</Text>
+          <Button title="Ordernar aleatoriamente" onPress={generateRandomOrder} />
+          {(!hasSubmittedOrder && orderedCards && orderedCards.length == 9) ? (
+              <Button title="Aceptar orden de cartas" onPress={sendOrderCards} />
+          ) : (
+            <Button title="Aceptar orden de cartas" disabled />
+          )}
+        </View>
+      </>
+    )
+  }
 
   // Renderizado principal de la pantalla de juego
   if(!salaEstado || !userLocal || !availableCards)
@@ -184,45 +315,9 @@ export default function GameView() {
       <Text>Ronda: {salaEstado.ronda}</Text>
 
       {salaEstado.jugadores.length < 2 && <Text>Esperando más jugadores...</Text>}
-      {userLocal && (
-        <View style={styles.playerSection}>
-          <Text style={styles.playerName}>Tus Cartas ({availableCards.length}):</Text>
-          <View style={styles.cardsContainer}>
-            {orderedCards.map((card, i) => (
-              <View style={styles.cardContainer}>
-                {/* <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text> */}
-                <View style={styles.selectedCardContainer}>
-                  <Image style={styles.darkCard} source={imageSources[card.id]} />
-                  <Text style={[styles.whiteText, styles.textSelected]}>{i + 1}</Text>
-                </View>
-                <Button title="Eliminar orden" onPress={()=>removeOrderCardIndividual(i)} />
-              </View>
-            ))}
-            {availableCards.map((card, i) => (
-              <View style={styles.cardContainer}>
-                {/* <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text> */}
-                <Image style={styles.imgCard} source={imageSources[card.id]} />
-                <Button title="Seleccionar" onPress={()=>selectOrderCardIndividual(i)} />
-                {/* <Text>Sin orden</Text> */}
-              </View>
-            ))}
-          </View>
-          <Text>Cartas ordenadas: {orderedCards[orderedCards.length-1] ? 'Sí' : 'No'}</Text>
-          <Button title="Ordernar aleatoriamente" onPress={generateRandomOrder} />
-          {(orderedCards.length == 9 && !hasSubmittedOrder) ? (
-              <Button title="Aceptar orden de cartas" onPress={sendOrderCards} />
-          ) : (
-            <Button title="Aceptar orden de cartas" disabled />
-          )}
-        </View>
-      )}
-
-      {userEnemy && (
-        <View style={styles.playerSection}>
-          <Text style={styles.playerName}>Cartas de {userEnemy.usuario.usuario.usuario} ({userEnemy.cartas.length}):</Text>
-        </View>
-      )}
-
+      
+      {renderPlayingGame()}
+      {renderResultsRound()}
       {salaEstado.estado === 'cartas-ordenadas' && (
         <Button title="Enfrentar Cartas" onPress={handleEnfrentarCartas} />
       )}
@@ -243,7 +338,7 @@ export default function GameView() {
           )}
         </View>
       )}  
-    <LoadingScreen isLoading={isLoading} text="Cargando partida..." />;
+    <LoadingScreen isLoading={isLoading} text="Cargando partida..." />
     </View>
   );
 }
@@ -281,8 +376,22 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
+  cardsPlayerContainer:
+  {
+    display: "flex",
+    flex: 1,
+    flexWrap: "wrap",
+    flexDirection: "column",
+    alignContent: "center",
+    alignItems: "center"
+  },
   playerName: {
     fontSize: 18,
+    marginBottom: 10,
+  },
+  textInfo:
+  {
+    fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 10,
   },
