@@ -35,7 +35,6 @@ export default function GameView() {
   const [availableCards, setAvailableCards] = useState([]) //Elegidas van a CardsPlayerOrder
   const [orderedCards, setOrderedCards] = useState([])
   const [hasSubmittedOrder, setHasSubmittedOrder] = useState(false) //inmovible apenas tenga true
-  const [duelFinished, setDuelFinished] = useState(false)
   const [salaEstado, setSalaEstado] = useState(null)
   const [cardsPlayerLocal, setCardsPlayerLocal] = useState(null)
   const [cardsPlayerEnemy, setCardsPlayerEnemy] = useState(null)
@@ -47,7 +46,7 @@ export default function GameView() {
 
     socket.on('BATALLA_RONDA',(room)=>
     {
-      if(room.estado === "cartas-ordenadas")
+      if(room.estado === "cartas-ordenadas" || room.estado === "partida-finalizada") //partida-finalizada agregado  de último momento por cambios de estructura
       {
         console.log('QUE EMPIECE EL ENFRENTAMIENTO DE CARTAS');
         const local = room.jugadores.find(j => j.id === userData.id);
@@ -60,6 +59,7 @@ export default function GameView() {
       }
       else
       {
+        console.log(room);
         console.log('Falta un jugador todavía');
       }
     })
@@ -67,7 +67,9 @@ export default function GameView() {
     socket.on('FIN_DE_PARTIDA', ()=>
     {
       console.log('Terminó partida, a irse bye');
+      playerExitRoom();
     })
+    
     // Escuchar el estado de la sala actualizado
     socket.on('ESTADO_SALA_ACTUALIZADO', (sala) => {
       console.log('GameView - Estado de la sala actualizado:', sala);
@@ -83,7 +85,7 @@ export default function GameView() {
         }
         setIsLoading(false);
         // Puedes navegar de nuevo al Lobby o Home después de un breve retraso
-        setTimeout(() => navigation.replace('Lobby'), 3000);
+        //setTimeout(() => navigation.replace('Lobby'), 3000);
       }
     });
 
@@ -100,7 +102,7 @@ export default function GameView() {
       socket.off('ESTADO_SALA_ACTUALIZADO');
       socket.off('ERROR');
     };
-  }, []);
+  }, [navigation]);
   // --- Funciones para enviar acciones al Backend ---
   const handleOrdenarCartas = () => {
     if (!salaEstado || !userData.id) return Alert.alert('Error', 'No hay datos de sala o usuario.');
@@ -155,9 +157,9 @@ export default function GameView() {
   const sendOrderCards = ()=>
   {
     setIsLoading(true);
-    console.log("ENVIAR CARTAS");
+    /* console.log("ENVIAR CARTAS");
     console.log("ID: ", userData.id);
-    console.log("nuevoOrden: ", orderedCards);
+    console.log("nuevoOrden: ", orderedCards); */
     setHasSubmittedOrder(true);
     socket.emit('CARTAS_ORDENADAS_ENVIADO', { id: userData.id, nuevoOrden: orderedCards });
   }
@@ -231,13 +233,15 @@ export default function GameView() {
   {
     if(cardsPlayerEnemy == null)
     return (<></>);
-
+    console.log(salaEstado);
+    console.log(salaEstado.ganador);
+    
     return(
       <>
         <View style={styles.playerSection}>
+          {/* <Text style={styles.textInfo}>Ronda {salaEstado.ronda}</Text>
             <Text style={styles.textInfo}>{salaEstado.ganador == 'empate' ? "Empate"
-            : salaEstado.ganador == userLocal.id ? "¡Has ganado!" : "Has perdido"}</Text>
-            <Text style={styles.textInfo}>Ronda {salaEstado.ronda}</Text>
+            : salaEstado.ganador == userLocal.id ? "¡Has ganado!" : "Has perdido"}</Text> */}
             {/* Render enemy cards */}
             <View style={styles.cardsPlayerContainer}>
               <Text style={styles.playerName}>{userEnemy.usuario.usuario.usuario}</Text>
@@ -280,12 +284,27 @@ export default function GameView() {
               </View>
               <Text style={styles.playerName}>{userLocal.usuario.usuario.usuario}</Text>
             </View>
-            <TouchableOpacity style={styles.boton} onPress={()=>navigation.navigate("Lobby")}>
+            <TouchableOpacity style={styles.boton} onPress={()=>playerEmitExit()}>
               <Text style={styles.textoBoton}>Volver al lobby</Text>
             </TouchableOpacity>
           </View>
       </>
     )
+  }
+
+  const playerExitRoom = ()=>
+  {
+    setSalaEstado(null);
+    setCardsPlayerLocal(null);
+    setCardsPlayerEnemy(null);
+    setUserLocal(null);
+    setUserEnemy(null);
+    navigation.navigate("Lobby");
+  }
+
+  const playerEmitExit = ()=>
+  {
+    socket.emit('SALIR_SALA', { id: userData.id });
   }
 
   const renderPlayingGame=()=>
@@ -296,7 +315,7 @@ export default function GameView() {
     return(
       <>
         <View style={styles.playerSection}>
-          <Text style={styles.playerName}>Cartas de {userEnemy.usuario.usuario.usuario} ({userEnemy.cartas.length}):</Text>
+          <Text style={styles.playerName}>{userEnemy.cartas.length} cartas de {userEnemy.usuario.usuario.usuario}</Text>
         </View>
         <View style={styles.playerSection}>
           <Text style={styles.playerName}>Tus Cartas ({availableCards.length}):</Text>
@@ -345,21 +364,13 @@ export default function GameView() {
   }
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Pantalla videojuego - {userData.usuario.usuario}</Text>
+{/*       <Text style={styles.title}>Pantalla videojuego - {userData.usuario.usuario}</Text>
       <Text>Estado de la Sala: {salaEstado.estado}</Text>
-      <Text>Ronda: {salaEstado.ronda}</Text>
+      <Text>Ronda: {salaEstado.ronda}</Text> */}
 
       {salaEstado.jugadores.length < 2 && <Text>Esperando más jugadores...</Text>}
-      
-      {renderPlayingGame()}
-      {renderResultsRound()}
-      {/* {salaEstado.estado === 'cartas-ordenadas' && (
-        <Button title="Enfrentar Cartas" onPress={handleEnfrentarCartas} />
-      )} */}
-
       {salaEstado.estado === 'partida-finalizada' && salaEstado.resultado && (
         <View style={styles.resultsSection}>
-          <Text style={styles.resultsTitle}>Resultados de la Ronda:</Text>
           <Text>{userLocal.usuario.usuario.usuario} {userLocal.usuario.id === salaEstado.ganador ? " ha ganado" : "ha pedido"}</Text>
           <Text>{userEnemy.usuario.usuario.usuario} {userEnemy.usuario.id === salaEstado.ganador ? " ha ganado" : "ha pedido"}</Text>
           {salaEstado.ganador && salaEstado.finalizada ? (
@@ -368,11 +379,16 @@ export default function GameView() {
             <Text style={styles.infoText}>La partida ha finalizado.</Text>
           )}
 
-          {salaEstado.estado === 'partida-finalizada' && !salaEstado.finalizada && ( // Si la ronda terminó pero no el juego
+          {/* {salaEstado.estado === 'partida-finalizada' && !salaEstado.finalizada && ( // Si la ronda terminó pero no el juego
             <Button title="Avanzar a Siguiente Ronda" onPress={handleAvanzarRonda} />
-          )}
+          )} */}
         </View>
       )}  
+      {renderPlayingGame()}
+      {renderResultsRound()}
+      {/* {salaEstado.estado === 'cartas-ordenadas' && (
+        <Button title="Enfrentar Cartas" onPress={handleEnfrentarCartas} />
+      )} */}
     <LoadingScreen isLoading={isLoading} text="Cargando partida..." />
     </View>
   );
@@ -404,11 +420,10 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   playerSection: {
-    marginTop: 20,
-    padding: 15,
+    marginTop: 10,
+    padding: 10,
     backgroundColor: '#e0e0e0',
     borderRadius: 8,
-    width: '100%',
     alignItems: 'center',
   },
   cardsPlayerContainer:
@@ -488,19 +503,18 @@ const styles = StyleSheet.create({
     opacity: 0.5
   },
   resultsSection: {
-    marginTop: 30,
-    padding: 20,
+    marginTop: 5,
+    padding: 10,
     backgroundColor: '#d4edda', // Light green background for results
     borderRadius: 10,
     alignItems: 'center',
-    width: '100%',
     borderWidth: 1,
     borderColor: '#28a745',
   },
   resultsTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 5,
     color: '#28a745',
   },
   winnerText: {
