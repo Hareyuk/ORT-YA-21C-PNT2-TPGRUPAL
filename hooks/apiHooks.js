@@ -160,7 +160,7 @@ export function ApiHooksProvider({ children }) {
   };
 
   const apiGetUsers = async () => {
-    return fetchGet(apiUsersPath); // Aquí si la ruta base es solo /api/usuarios
+    return fetchGet(apiUsers); // Aquí si la ruta base es solo /api/usuarios
   };
 
   const apiPostLoginuser = async (formData) => {

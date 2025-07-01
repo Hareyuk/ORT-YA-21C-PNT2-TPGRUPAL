@@ -158,7 +158,7 @@ export default function EditProfile({ navigation }) {
         await apiDeleteUser(userData.id);
         Alert.alert("Tu cuenta ha sido eliminada.");
         logOutUser(); 
-        navigation.navigate('Login'); 
+        navigation.navigate('Home'); 
     } catch (e) {
         console.error("Error al eliminar cuenta (API):", e);
         Alert.alert("Error", "No se pudo eliminar la cuenta. Intenta de nuevo.");

@@ -92,7 +92,7 @@ export default function SignUp() {
 
     try {
       await apiPostCreateUser(data);
-      // Podés agregar un mensaje en pantalla o redireccionar
+      navigation.navigate('Home');
     } catch (e) {
       // Mostrar error de conexión o guardado si querés
     }
