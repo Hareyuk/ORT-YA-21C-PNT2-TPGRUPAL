@@ -15,6 +15,7 @@ const UserLoggedStatusContext = createContext(
     userToken: null,
     userCountry: null,
     isLoadingAuth: true, 
+    callUpdateTokenUser: () => {}
   }
 );
 
@@ -25,8 +26,8 @@ export function UserLoggedStatusProvider({ children }) {
   const [isUserLogged, setIsUserLogged] = useState(false);
   const [userCountry, setUserCountry] = useState(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Nuevo estado para controlar la carga inicial
-
-  const { apiPostLoginuser } = useApiHooks();
+  const [updateInfoUser, setUpdateInfoUser] = useState(false) //cuando es true, llama a la API obteniendo nueva información de usuario
+  const { apiPostLoginuser, apiGetNewToken } = useApiHooks();
 
   // --- Primer useEffect: Cargar el token desde AsyncStorage al iniciar la app ---
   useEffect(() => {
@@ -54,7 +55,7 @@ export function UserLoggedStatusProvider({ children }) {
         setIsLoadingAuth(false); // La carga inicial siempre finaliza aquí
       }
     };
-    loadStoredToken();
+    if(!userData) loadStoredToken();
   }, []); // Se ejecuta solo una vez al montar
 
   // --- Segundo useEffect: Decodificar el token y setear el estado de logueo ---
@@ -112,6 +113,55 @@ export function UserLoggedStatusProvider({ children }) {
     }
   }, [userToken]); // Se ejecuta cada vez que userToken cambia
 
+  const callUpdateTokenUser= async (cb)=>
+  {
+    const newTokenResponse = await apiGetNewToken(userData.id)
+    await validarYDescrifarToken(newTokenResponse);
+    cb(); //Callback desde editProfile.jsx para volver a Profile
+  }
+  
+  useEffect(()=>
+  {
+    const getNewDataUser = async()=>
+    {
+      /*
+        Mínima persistencia no funcionó
+        console.log('DataUser og: ', userData);    
+        const newDataUser = await apiGetUserById(userData.id)
+        console.log('Información actualizada de user: ', newDataUser);
+        setUserData(newDataUser);
+      */
+      const newTokenResponse = await apiGetNewToken(userData.id)
+      validarYDescrifarToken(newTokenResponse);
+      setUpdateInfoUser(false);
+    }
+    if(updateInfoUser)
+    {
+      getNewDataUser();
+    }
+  }, [updateInfoUser])
+
+  async function validarYDescrifarToken(response) {
+      if (response && response.token && typeof response.token === 'string' && response.token.trim() !== '') {
+        const receivedToken = response.token;
+        //console.log('DEBUG (UserLogged): TOKEN CRUDO RECIBIDO:', receivedToken); // <-- ¡Añade esta línea!
+        // Validamos el token recién recibido del servidor antes de guardarlo y usarlo
+        if (receivedToken.includes('.') && receivedToken.split('.').length === 3) {
+          const decoded = jwtDecode(receivedToken);
+          await AsyncStorage.storeData(AUTH_KEY, receivedToken); // Guardar solo si es válido
+          setUserToken(receivedToken); // Esto disparará el segundo useEffect
+          // setUserData(decoded); // Estos los setea el segundo useEffect ahora
+          // setIsUserLogged(true);
+          success = true;
+          console.log("Login exitoso. Token recibido y decodificado.");
+        } else {
+          console.error("Token recibido del servidor tiene formato inválido. No se guardará.");
+        }
+      } else {
+        console.error("Login fallido: No se recibió un token válido del servidor.");
+      }
+    }
+
   // Funciones de autenticación
   const logInUser = async (data) => {
     let success = false;
@@ -119,28 +169,12 @@ export function UserLoggedStatusProvider({ children }) {
       // apiPostLoginuser ya devuelve el token directamente o lanza un error
       const response = await apiPostLoginuser(data); // Asumo que response es { token: "..." }
 
-      if (response && response.token && typeof response.token === 'string' && response.token.trim() !== '') {
-        const receivedToken = response.token;
- //console.log('DEBUG (UserLogged): TOKEN CRUDO RECIBIDO:', receivedToken); // <-- ¡Añade esta línea!
-        // Validamos el token recién recibido del servidor antes de guardarlo y usarlo
-        if (receivedToken.includes('.') && receivedToken.split('.').length === 3) {
-            const decoded = jwtDecode(receivedToken);
-            await AsyncStorage.storeData(AUTH_KEY, receivedToken); // Guardar solo si es válido
-            setUserToken(receivedToken); // Esto disparará el segundo useEffect
-            // setUserData(decoded); // Estos los setea el segundo useEffect ahora
-            // setIsUserLogged(true);
-            success = true;
-            console.log("Login exitoso. Token recibido y decodificado.");
-        } else {
-            console.error("Token recibido del servidor tiene formato inválido. No se guardará.");
-        }
-      } else {
-        console.error("Login fallido: No se recibió un token válido del servidor.");
-      }
+      await validarYDescrifarToken(response);
     } catch (e) {
       console.error("ERROR LOGIN (en logInUser): ", e);
     }
     return success;
+
   };
 
   const logOutUser = async () => {
@@ -158,6 +192,7 @@ export function UserLoggedStatusProvider({ children }) {
     userToken,
     userCountry,
     isLoadingAuth, 
+    callUpdateTokenUser
   };
 
   // Pantalla de carga mientras se verifica la sesión inicial

@@ -16,7 +16,7 @@ import { useAuthUser } from "../../../hooks/userLogged.js";
 import estilos from "./estiloEditProfile";
 
 export default function EditProfile({ navigation }) {
-  const { userData, userToken, isUserLogged, isLoadingAuth, logOutUser } = useAuthUser();
+  const { userData, userToken, isUserLogged, isLoadingAuth, logOutUser, callUpdateTokenUser } = useAuthUser();
   const [usuario, setUsuario] = useState(userData.usuario);
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -127,14 +127,13 @@ export default function EditProfile({ navigation }) {
     try {
       const response = await apiPutUpdateUser(userData.id, dataToUpdate);
       console.log("Respuesta del servidor al actualizar:", response);
-
       if (response) {
         Alert.alert("Perfil actualizado correctamente.");
-        navigation.navigate('Home')
+        //Actualizar info user
+        callUpdateTokenUser(()=>{navigation.navigate("Profile")});
         setNewPassword("");
         setConfirmPassword("");
         setErrores({});
-
         setFormValido(false);
       } else {
 
@@ -212,7 +211,6 @@ export default function EditProfile({ navigation }) {
     return (
       <View style={styles.loadingContainer}>
         <Text style={styles.loadingText}>No estás logueado. Redirigiendo...</Text>
-        {/* Opcional: Redirigir automáticamente */}
         {useEffect(() => {
           if (!isUserLogged && !isLoadingAuth) {
             navigation.navigate('Login');
