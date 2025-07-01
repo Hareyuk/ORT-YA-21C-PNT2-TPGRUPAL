@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, StyleSheet, Button, Alert, Image } from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet, Button, Alert, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import socket from '../src/services/socketService'; // Asegúrate de que esta ruta sea correcta
 import { useAuthUser } from "../hooks/userLogged";
@@ -39,7 +39,6 @@ export default function GameView() {
   const [salaEstado, setSalaEstado] = useState(null)
   const [cardsPlayerLocal, setCardsPlayerLocal] = useState(null)
   const [cardsPlayerEnemy, setCardsPlayerEnemy] = useState(null)
-  
   // --- Lógica de Socket.IO para recibir el estado del juego ---
   useEffect(() => {
     
@@ -199,6 +198,35 @@ export default function GameView() {
     }
   }, [userLocal])
 
+  const renderIndividualResultFightCards=(typePlayer, typeRival)=>
+  {
+    let resultado = '';
+    const PIEDRA = 'piedra';
+    const TIJERA = 'tijera';
+    const PAPEL = 'papel'
+    if(typePlayer === typeRival) resultado = 'draw';
+    if (typePlayer === PIEDRA)
+    {
+      if(typeRival === TIJERA) resultado = 'win';
+      if(typeRival === PAPEL) resultado = 'lose';
+    } 
+    if (typePlayer === PAPEL)
+    {
+      if(typeRival === PIEDRA) resultado = 'win';
+      if(typeRival === TIJERA) resultado = 'lose';
+    } 
+    if (typePlayer === TIJERA)
+    {
+      if(typeRival === PAPEL) resultado = 'win';
+      if(typeRival === PIEDRA) resultado = 'lose';
+    }
+    let src;
+    if(resultado==='win') src=(require('../assets/img/match_win.png'));
+    if(resultado==='lose') src=(require('../assets/img/match_loss.png'));
+    if(resultado==='draw') src=(require('../assets/img/match_draw.png'));
+    return(<Image style={styles.imgResult} source={src} />)
+  }
+
   const renderResultsRound=()=>
   {
     if(cardsPlayerEnemy == null)
@@ -207,7 +235,8 @@ export default function GameView() {
     return(
       <>
         <View style={styles.playerSection}>
-            <Text style={styles.textInfo}>¡Enfrentamiento!</Text>
+            <Text style={styles.textInfo}>{salaEstado.ganador == 'empate' ? "Empate"
+            : salaEstado.ganador == userLocal.id ? "¡Has ganado!" : "Has perdido"}</Text>
             <Text style={styles.textInfo}>Ronda {salaEstado.ronda}</Text>
             {/* Render enemy cards */}
             <View style={styles.cardsPlayerContainer}>
@@ -224,15 +253,18 @@ export default function GameView() {
             </View>
             {/* Render results */}
             <View style={styles.cardsPlayerContainer}>
-              <Text style={styles.playerName}>{userEnemy.usuario.usuario.usuario}</Text>
               <View style={styles.cardsContainer}>
-                {cardsPlayerEnemy.map((card, i) => (
-                  <View key={`cards-enemy-${i}`} style={styles.cardContainer}>
-                    <View style={styles.selectedCardContainer}>
-                      <Image style={styles.imgCard} source={imageSources[card.id]} />
-                    </View>
-                  </View>
-                ))}
+                {
+                  cardsPlayerLocal.map((cardPlayer, i)=>
+                  {
+                    const typeCardPlayer = cardPlayer.tipo;
+                    const typeCardRival = cardsPlayerEnemy[i].tipo;  
+                    return(
+                      <View key={`result-win-matchs-${i}`} style={styles.imgResultContainer}>
+                        {renderIndividualResultFightCards(typeCardPlayer, typeCardRival)}
+                      </View>
+                    )})
+                }
               </View>
             </View>
             {/* Render local player cards */}
@@ -248,6 +280,9 @@ export default function GameView() {
               </View>
               <Text style={styles.playerName}>{userLocal.usuario.usuario.usuario}</Text>
             </View>
+            <TouchableOpacity style={styles.boton} onPress={()=>navigation.navigate("Lobby")}>
+              <Text style={styles.textoBoton}>Volver al lobby</Text>
+            </TouchableOpacity>
           </View>
       </>
     )
@@ -318,9 +353,9 @@ export default function GameView() {
       
       {renderPlayingGame()}
       {renderResultsRound()}
-      {salaEstado.estado === 'cartas-ordenadas' && (
+      {/* {salaEstado.estado === 'cartas-ordenadas' && (
         <Button title="Enfrentar Cartas" onPress={handleEnfrentarCartas} />
-      )}
+      )} */}
 
       {salaEstado.estado === 'partida-finalizada' && salaEstado.resultado && (
         <View style={styles.resultsSection}>
@@ -379,7 +414,6 @@ const styles = StyleSheet.create({
   cardsPlayerContainer:
   {
     display: "flex",
-    flex: 1,
     flexWrap: "wrap",
     flexDirection: "column",
     alignContent: "center",
@@ -409,6 +443,12 @@ const styles = StyleSheet.create({
     width: 150,
     padding: 5
   },
+  imgResultContainer:
+  {
+    width: 150,
+    height: 75,
+    padding: 5
+  },
   selectedCardContainer:
   {
     position: "relative",
@@ -430,7 +470,15 @@ const styles = StyleSheet.create({
     aspectRatio: 4/5,
     height: "auto",
     width: "auto",
-    backgroundColor: "#201313"
+    backgroundColor: "#201313",
+    borderRadius: 5
+  },
+  imgResult:
+  {
+    height: "80%",
+    width: "80%",
+    resizeMode: "contain",
+    alignSelf: "center"
   },
   darkCard:
   {
@@ -438,8 +486,7 @@ const styles = StyleSheet.create({
     height: "auto",
     width: "auto",
     opacity: 0.5
-  }
-  ,
+  },
   resultsSection: {
     marginTop: 30,
     padding: 20,
@@ -478,5 +525,12 @@ const styles = StyleSheet.create({
     left: "50%",
     top: "50%",
     transform: [{translateX: "-50%"}, {translateY: "-50%"}]
-  }
+  },
+  boton: {
+    backgroundColor: "#3a2a23",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 4,
+  },
+  textoBoton: { color: "#fff", fontWeight: "bold" },
 });

@@ -12,6 +12,9 @@ import { navigate } from "expo-router/build/global-state/routing";
 export default function LobbyView() {
 
   const { userData } = useAuthUser();
+  const pfp = userData.pfp;
+  const wins = userData.wins;
+  const losses = userData.losses;
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [isChecked, setChecked] = useState(false); //For private rooms
@@ -29,7 +32,6 @@ export default function LobbyView() {
   // --- Lógica de Socket.IO para recibir el estado de la sala ---
   useEffect( () => {
     setIsLoading(true);
-    
     // Listener para el estado actualizado de la sala
     socket.on('ESTADO_SALA_ACTUALIZADO', (sala) => {
       console.log('LobbyView - Estado de la sala actualizado:', sala);
@@ -109,13 +111,13 @@ export default function LobbyView() {
         <View style={styles.userInfo}>
           <View style={styles.personalInfo}>
             <Image
-              source={require("../assets/icon.png")}
+              source={pfp}
               style={styles.avatar}
             />
             <Text style={[styles.whiteText, styles.bigText, styles.containerUserTexts]}>
-              <Text style={{display: "block", textAlign: "center"}}>Usuario: {userData.usuario}</Text>
-              <Text style={{display: "block", textAlign: "center"}}>Victorias: --</Text>
-              <Text style={{display: "block", textAlign: "center"}}>Derrotas: --</Text>
+              <Text style={{display: "block", textAlign: "center"}}>{userData.usuario}</Text>
+              <Text style={{display: "block", textAlign: "center"}}>Victorias: {wins}</Text>
+              <Text style={{display: "block", textAlign: "center"}}>Derrotas: {losses}</Text>
             </Text>
           </View>
           <Button cb={onPlayRandom}>Jugar cualquier partida</Button>
