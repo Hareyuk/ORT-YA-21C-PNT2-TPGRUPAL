@@ -8,6 +8,7 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  Platform,
   StyleSheet,
 } from "react-native";
 import { useApiHooks } from "../../../hooks/apiHooks.js";
@@ -24,6 +25,7 @@ export default function EditProfile({ navigation }) {
   const [formValido, setFormValido] = useState(false);
   const [userPfp, setUserPfp] = useState(userData.pfp)
   const { apiPutUpdateUser, apiDeleteUser } = useApiHooks();
+
 
   useEffect(() => {
     if (isUserLogged && userData) {
@@ -89,9 +91,9 @@ export default function EditProfile({ navigation }) {
 
   const guardarCambios = async () => {
 
-     if (!isUserLogged || !userData || !userData.id) {
-        Alert.alert("Error", "No se pudo obtener la información del usuario logueado para actualizar.");
-        return; // Si esta condición es verdadera, la función termina aquí.
+    if (!isUserLogged || !userData || !userData.id) {
+      Alert.alert("Error", "No se pudo obtener la información del usuario logueado para actualizar.");
+      return; // Si esta condición es verdadera, la función termina aquí.
     }
 
     console.log("Guardar:", { newEmail, newPassword, confirmPassword });
@@ -128,7 +130,7 @@ export default function EditProfile({ navigation }) {
 
       if (response) {
         Alert.alert("Perfil actualizado correctamente.");
-        navigation.navigate('Profile')
+        navigation.navigate('Home')
         setNewPassword("");
         setConfirmPassword("");
         setErrores({});
@@ -142,11 +144,43 @@ export default function EditProfile({ navigation }) {
       console.error("Error al intentar actualizar perfil:", e);
     }
 
-    };
+  };
 
-    const eliminarCuenta = () => {
+  // --- Lógica de eliminación de cuenta ---
+  const handleDeleteAccount = async () => {
+
+    if (!isUserLogged || !userData || !userData.id) {
+        Alert.alert("No se pudo obtener el ID del usuario para eliminar.");
+        return;
+    }
+
+    try {
+        await apiDeleteUser(userData.id);
+        Alert.alert("Tu cuenta ha sido eliminada.");
+        logOutUser(); 
+        navigation.navigate('Login'); 
+    } catch (e) {
+        console.error("Error al eliminar cuenta (API):", e);
+        Alert.alert("Error", "No se pudo eliminar la cuenta. Intenta de nuevo.");
+    }
+  };
+
+
+  const eliminarCuenta = () => {
+    console.log("DEBUG: Botón Eliminar cuenta presionado.");
+
+    const confirmMessage = "¿Estás seguro de que quieres eliminar tu cuenta?";
+
+    if (Platform.OS === 'web') {
+     
+      if (window.confirm(confirmMessage)) {
+        handleDeleteAccount();
+      }
+    } else {
+      
       Alert.alert(
-        "¿Estás seguro de que quieres eliminar tu cuenta? ",
+        "Confirmar Eliminación",
+        confirmMessage,
         [
           {
             text: "Cancelar",
@@ -154,31 +188,18 @@ export default function EditProfile({ navigation }) {
           },
           {
             text: "Eliminar",
-            onPress: () => {
-
-              if (isUserLogged && userData && userData.id) {
-                apiDeleteUser(userData.id)
-                  .then(() => {
-                    Alert.alert("Tu cuenta ha sido eliminada.");
-
-                    navigation.navigate('Home');
-                    logOutUser();
-                  })
-                  .catch(e => {
-                    console.error("Error al eliminar cuenta:", e);
-                    Alert.alert("Error", "No se pudo eliminar la cuenta. Intenta de nuevo.");
-                  });
-              } else {
-                Alert.alert("Error", "No se pudo obtener el ID del usuario para eliminar.");
-              }
-            },
+            onPress: handleDeleteAccount,
             style: "destructive",
           },
         ],
         { cancelable: true }
       );
-    };
-if (isLoadingAuth) {
+    }
+  };
+
+
+
+  if (isLoadingAuth) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -193,99 +214,99 @@ if (isLoadingAuth) {
         <Text style={styles.loadingText}>No estás logueado. Redirigiendo...</Text>
         {/* Opcional: Redirigir automáticamente */}
         {useEffect(() => {
-            if (!isUserLogged && !isLoadingAuth) {
-                navigation.navigate('Login');
-            }
+          if (!isUserLogged && !isLoadingAuth) {
+            navigation.navigate('Login');
+          }
         }, [isUserLogged, isLoadingAuth, navigation])}
       </View>
     );
   }
 
-    return (
-      <ScrollView contentContainerStyle={estilos.container}>
-        <View style={estilos.row}>
-          {/* IZQUIERDA */}
-          <View style={estilos.left}>
-            <Text style={estilos.titulo}>Editar perfil</Text>
-            <Image
-              source={userPfp}
-              style={estilos.avatar}
-            />
-            <TextInput
-              disabled
-              style={estilos.input}
-              placeholder={usuario} 
-              value={usuario}
-              /* onChangeText={setUsuario} */
-              autoCapitalize="none"
-            />
-            {errores.usuario && <Text style={{ color: "red" }}>{errores.usuario}</Text>}
+  return (
+    <ScrollView contentContainerStyle={estilos.container}>
+      <View style={estilos.row}>
+        {/* IZQUIERDA */}
+        <View style={estilos.left}>
+          <Text style={estilos.titulo}>Editar perfil</Text>
+          <Image
+            source={userPfp}
+            style={estilos.avatar}
+          />
+          <TextInput
+            disabled
+            style={estilos.input}
+            placeholder={usuario}
+            value={usuario}
+            /* onChangeText={setUsuario} */
+            autoCapitalize="none"
+          />
+          {errores.usuario && <Text style={{ color: "red" }}>{errores.usuario}</Text>}
 
-            <TextInput
-              style={estilos.input}
-              placeholder="Nuevo email"
-              value={newEmail}
-              onChangeText={setNewEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-            {errores.newEmail && <Text style={{ color: "red" }}>{errores.newEmail}</Text>}
+          <TextInput
+            style={estilos.input}
+            placeholder="Nuevo email"
+            value={newEmail}
+            onChangeText={setNewEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          {errores.newEmail && <Text style={{ color: "red" }}>{errores.newEmail}</Text>}
 
-            <TextInput
-              style={estilos.input}
-              placeholder="Nueva contraseña"
-              value={newPassword}
-              onChangeText={setNewPassword}
-              secureTextEntry
-            />
-            {errores.newPassword && <Text style={{ color: "red" }}>{errores.newPassword}</Text>}
+          <TextInput
+            style={estilos.input}
+            placeholder="Nueva contraseña"
+            value={newPassword}
+            onChangeText={setNewPassword}
+            secureTextEntry
+          />
+          {errores.newPassword && <Text style={{ color: "red" }}>{errores.newPassword}</Text>}
 
-            <TextInput
-              style={estilos.input}
-              placeholder="Confirmar nueva contraseña"
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-              secureTextEntry
-            />
-            {errores.confirmPassword && <Text style={{ color: "red" }}>{errores.confirmPassword}</Text>}
+          <TextInput
+            style={estilos.input}
+            placeholder="Confirmar nueva contraseña"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+          />
+          {errores.confirmPassword && <Text style={{ color: "red" }}>{errores.confirmPassword}</Text>}
 
-            <TouchableOpacity
-              style={[estilos.boton, estilos.botonGuardar, { backgroundColor: formValido ? "#3a2a23" : "#ccc" }]}
-              onPress={guardarCambios}
-              disabled={!formValido} // Deshabilitar si no es válido o no hay cambios
-            >
-              <Text style={estilos.textoBoton}>Guardar cambios</Text>
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={[estilos.boton, estilos.botonGuardar, { backgroundColor: formValido ? "#3a2a23" : "#ccc" }]}
+            onPress={guardarCambios}
+            disabled={!formValido} // Deshabilitar si no es válido o no hay cambios
+          >
+            <Text style={estilos.textoBoton}>Guardar cambios</Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[estilos.boton, estilos.botonEliminar]}
-              onPress={eliminarCuenta}
-            >
-              <Text style={estilos.textoEliminar}>Eliminar cuenta</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* DERECHA */}
-          <View style={estilos.right}>
-            <Image
-              source={require("../../../assets/icon.png")}
-              style={estilos.placeholder}
-            />
-          </View>
+          <TouchableOpacity
+            style={[estilos.boton, estilos.botonEliminar]}
+            onPress={eliminarCuenta}
+          >
+            <Text style={estilos.textoEliminar}>Eliminar cuenta</Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
-    );
-  }
+
+        {/* DERECHA */}
+        <View style={estilos.right}>
+          <Image
+            source={require("../../../assets/icon.png")}
+            style={estilos.placeholder}
+          />
+        </View>
+      </View>
+    </ScrollView>
+  );
+}
 const styles = StyleSheet.create({
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 18,
-        color: '#333',
-    }
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#333',
+  }
 });
