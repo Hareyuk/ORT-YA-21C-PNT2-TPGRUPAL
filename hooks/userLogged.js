@@ -120,17 +120,17 @@ export function UserLoggedStatusProvider({ children }) {
     cb(); //Callback desde editProfile.jsx para volver a Profile
   }
   
-  useEffect(()=>
+/*   useEffect(()=>
   {
     const getNewDataUser = async()=>
     {
-      /*
-        Mínima persistencia no funcionó
-        console.log('DataUser og: ', userData);    
-        const newDataUser = await apiGetUserById(userData.id)
-        console.log('Información actualizada de user: ', newDataUser);
-        setUserData(newDataUser);
-      */
+      
+        // Mínima persistencia no funcionó
+        // console.log('DataUser og: ', userData);    
+        // const newDataUser = await apiGetUserById(userData.id)
+        // console.log('Información actualizada de user: ', newDataUser);
+        // setUserData(newDataUser);
+     
       const newTokenResponse = await apiGetNewToken(userData.id)
       validarYDescrifarToken(newTokenResponse);
       setUpdateInfoUser(false);
@@ -140,7 +140,7 @@ export function UserLoggedStatusProvider({ children }) {
       getNewDataUser();
     }
   }, [updateInfoUser])
-
+ */
   async function validarYDescrifarToken(response) {
       if (response && response.token && typeof response.token === 'string' && response.token.trim() !== '') {
         const receivedToken = response.token;
