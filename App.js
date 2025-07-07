@@ -18,6 +18,7 @@ import GameView from './screens/gameScreen';
 import LobbyView from './screens/lobbyScreen';
 import ProfileView from './screens/profileScreen';
 import { NotificadorProvider } from './src/context/NotificadorContext'; // ⬅️ NUEVO IMPORT
+import { UserTokenProvider } from './hooks/hookToken';
 
 const StackNavigation = () => {
   const Stack = createNativeStackNavigator();
@@ -59,6 +60,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
+      <UserTokenProvider>
       <ApiHooksProvider>
         <UserLoggedStatusProvider>
           <NotificadorProvider> {/* ⬅️ NUEVO ENVOLTORIO */}
@@ -72,6 +74,7 @@ export default function App() {
           </NotificadorProvider>
         </UserLoggedStatusProvider>
       </ApiHooksProvider>
+      </UserTokenProvider>
     </SafeAreaProvider>
   );
 }

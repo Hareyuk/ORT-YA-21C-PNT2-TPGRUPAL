@@ -16,7 +16,7 @@ import { useAuthUser } from "../../../hooks/userLogged.js";
 import estilos from "./estiloEditProfile";
 
 export default function EditProfile({ navigation }) {
-  const { userData, userToken, isUserLogged, isLoadingAuth, logOutUser, callUpdateTokenUser } = useAuthUser();
+  const { userData, userToken, logOutUser, callUpdateTokenUser } = useAuthUser();
   const [usuario, setUsuario] = useState(userData.usuario);
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -45,9 +45,9 @@ export default function EditProfile({ navigation }) {
   //useEffec para validar cuando cambio algo en el formulario
 
   useEffect(() => {
-    if (!isLoadingAuth) {
+  
       validarFormulario();
-    }
+    
   }, [usuario, newEmail, newPassword, confirmPassword]);
 
   const validarFormulario = () => {
@@ -195,30 +195,6 @@ export default function EditProfile({ navigation }) {
       );
     }
   };
-
-
-
-  if (isLoadingAuth) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-        <Text style={styles.loadingText}>Cargando perfil...</Text>
-      </View>
-    );
-  }
-  if (!isUserLogged || !userData) {
-    // Puedes redirigir al login o mostrar un mensaje
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>No estás logueado. Redirigiendo...</Text>
-        {useEffect(() => {
-          if (!isUserLogged && !isLoadingAuth) {
-            navigation.navigate('Login');
-          }
-        }, [isUserLogged, isLoadingAuth, navigation])}
-      </View>
-    );
-  }
 
   return (
     <ScrollView contentContainerStyle={estilos.container}>

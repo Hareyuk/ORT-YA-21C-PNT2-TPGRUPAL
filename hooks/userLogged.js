@@ -1,175 +1,52 @@
 import { useContext, useState, createContext, useEffect } from "react";
 import { useApiHooks } from "./apiHooks";
 import { ActivityIndicator, View, Text, StyleSheet } from 'react-native';
-import AsyncStorage from "../src/services/AsyncStorage"; // Asegúrate que esta ruta sea correcta
+import {useTokenUser} from './hookToken'
+import AsyncStorage from "../src/services/AsyncStorage";
 const AUTH_KEY = '@auth_data';
-import { jwtDecode } from "jwt-decode";
-import socket from "../src/services/socketService";
 
 const UserLoggedStatusContext = createContext(
   {
-    isUserLogged: false,
-    logInUser: () => {},
-    logOutUser: () => {},
-    userData: null,
-    userToken: null,
-    userCountry: null,
-    isLoadingAuth: true, 
-    callUpdateTokenUser: () => {}
+    logInUser: () => { },
+    logOutUser: () => { }
   }
 );
 
 export function UserLoggedStatusProvider({ children }) {
   // Estados
-  const [userToken, setUserToken] = useState(null);
-  const [userData, setUserData] = useState(null);
-  const [isUserLogged, setIsUserLogged] = useState(false);
-  const [userCountry, setUserCountry] = useState(null);
+  
   const [isLoadingAuth, setIsLoadingAuth] = useState(true); // Nuevo estado para controlar la carga inicial
-  const [updateInfoUser, setUpdateInfoUser] = useState(false) //cuando es true, llama a la API obteniendo nueva información de usuario
-  const { apiPostLoginuser, apiGetNewToken } = useApiHooks();
+  const { apiPostLoginuser } = useApiHooks();
+  const {setUserToken, userToken} = useTokenUser();
 
   // --- Primer useEffect: Cargar el token desde AsyncStorage al iniciar la app ---
   useEffect(() => {
+
     const loadStoredToken = async () => {
       try {
         setIsLoadingAuth(true); // Se inicia el proceso de carga
         const data = await AsyncStorage.getData(AUTH_KEY);
-        // console.log("Encuentro el token en el AsyncStorage", data);
         if (data) {
-          setUserToken(data); // Solo se setea el token, la decodificación va en el siguiente useEffect
-        } else {
-          // Si no hay token, aseguramos que los estados estén limpios
-          setUserToken(null);
-          setUserData(null);
-          setIsUserLogged(false);
+          setUserToken(data);
         }
       } catch (e) {
         console.error("Error al cargar el token de AsyncStorage:", e);
-        // Limpiar por si hay un error en la lectura de AsyncStorage
         await AsyncStorage.removeData(AUTH_KEY);
-        setUserToken(null);
-        setUserData(null);
-        setIsUserLogged(false);
       } finally {
-        setIsLoadingAuth(false); // La carga inicial siempre finaliza aquí
+        setIsLoadingAuth(false);
       }
     };
-    if(!userData) loadStoredToken();
-  }, []); // Se ejecuta solo una vez al montar
 
-  // --- Segundo useEffect: Decodificar el token y setear el estado de logueo ---
-  // Este useEffect se ejecuta CADA VEZ que `userToken` cambia.
-  useEffect(() => {
-    // Validamos userToken ANTES de intentar decodificarlo
-    if (userToken && typeof userToken === 'string' && userToken.trim() !== '') {
-      // Opcional pero recomendado: Verificación básica del formato JWT (tres partes)
-      if (userToken.includes('.') && userToken.split('.').length === 3) {
-        try {
-          const decoded = jwtDecode(userToken);
-          console.log('Usuario decodificado:', decoded);
-
-          // Opcional: Verificar si el token está expirado
-          const currentTime = Date.now() / 1000;
-          if (decoded.exp && decoded.exp < currentTime) {
-              console.warn("Token JWT expirado. Eliminando token y solicitando nuevo login.");
-              AsyncStorage.removeData(AUTH_KEY); // No esperamos el resultado
-              setUserToken(null); // Esto causará que este useEffect se ejecute de nuevo con null
-              setUserData(null);
-              setIsUserLogged(false);
-          } else {
-              setUserData({
-                  // Asignamos 'id' usando decoded.id si existe, de lo contrario, usamos decoded.usuario
-                  id: decoded.id || decoded.usuario, 
-                  usuario: decoded.usuario,
-                  email: decoded.email,
-                  pfp: decoded.pfp,
-                  wins: decoded.wins,
-                  losses: decoded.losses,
-                  draws: decoded.draws
-              });
-              setIsUserLogged(true);
-              // console.log('Ya está iniciado sesión');
-          }
-        } catch (decodeError) {
-          
-          console.error("Error al decodificar el token JWT:", decodeError);
-          AsyncStorage.removeData(AUTH_KEY); // Limpiar el token inválido
-          setUserToken(null); // Esto causará que este useEffect se ejecute de nuevo con null
-          setUserData(null);
-          setIsUserLogged(false);
-        }
-      } else {
-        console.warn("Token almacenado tiene formato inválido o incompleto. Eliminando.");
-        AsyncStorage.removeData(AUTH_KEY);
-        setUserToken(null);
-        setUserData(null);
-        setIsUserLogged(false);
-      }
-    } else {
-      // Si userToken es null, undefined, o vacío, aseguramos que el usuario NO esté logueado
-      setIsUserLogged(false);
-      setUserData(null);
-    }
-  }, [userToken]); // Se ejecuta cada vez que userToken cambia
-
-  const callUpdateTokenUser= async (cb)=>
-  {
-    const newTokenResponse = await apiGetNewToken(userData.id)
-    await validarYDescrifarToken(newTokenResponse);
-    cb(); //Callback desde editProfile.jsx para volver a Profile
-  }
-  
-  useEffect(()=>
-  {
-    const getNewDataUser = async()=>
-    {
-      /*
-        Mínima persistencia no funcionó
-        console.log('DataUser og: ', userData);    
-        const newDataUser = await apiGetUserById(userData.id)
-        console.log('Información actualizada de user: ', newDataUser);
-        setUserData(newDataUser);
-      */
-      const newTokenResponse = await apiGetNewToken(userData.id)
-      validarYDescrifarToken(newTokenResponse);
-      setUpdateInfoUser(false);
-    }
-    if(updateInfoUser)
-    {
-      getNewDataUser();
-    }
-  }, [updateInfoUser])
-
-  async function validarYDescrifarToken(response) {
-      if (response && response.token && typeof response.token === 'string' && response.token.trim() !== '') {
-        const receivedToken = response.token;
-        //console.log('DEBUG (UserLogged): TOKEN CRUDO RECIBIDO:', receivedToken); // <-- ¡Añade esta línea!
-        // Validamos el token recién recibido del servidor antes de guardarlo y usarlo
-        if (receivedToken.includes('.') && receivedToken.split('.').length === 3) {
-          const decoded = jwtDecode(receivedToken);
-          await AsyncStorage.storeData(AUTH_KEY, receivedToken); // Guardar solo si es válido
-          setUserToken(receivedToken); // Esto disparará el segundo useEffect
-          // setUserData(decoded); // Estos los setea el segundo useEffect ahora
-          // setIsUserLogged(true);
-          success = true;
-          console.log("Login exitoso. Token recibido y decodificado.");
-        } else {
-          console.error("Token recibido del servidor tiene formato inválido. No se guardará.");
-        }
-      } else {
-        console.error("Login fallido: No se recibió un token válido del servidor.");
-      }
-    }
+    if (!userToken) loadStoredToken();
+  }, []);
 
   // Funciones de autenticación
   const logInUser = async (data) => {
     let success = false;
     try {
-      // apiPostLoginuser ya devuelve el token directamente o lanza un error
-      const response = await apiPostLoginuser(data); // Asumo que response es { token: "..." }
-
-      await validarYDescrifarToken(response);
+      const response = await apiPostLoginuser(data); 
+      setUserToken(response.token)
+      success = true;
     } catch (e) {
       console.error("ERROR LOGIN (en logInUser): ", e);
     }
@@ -180,19 +57,12 @@ export function UserLoggedStatusProvider({ children }) {
   const logOutUser = async () => {
     console.log("Sesión cerrada");
     await AsyncStorage.removeData(AUTH_KEY);
-    setUserToken(null); 
-    setUserCountry(null);
+    setUserToken(null);
   };
 
   const value = {
-    isUserLogged,
     logInUser,
-    logOutUser,
-    userData,
-    userToken,
-    userCountry,
-    isLoadingAuth, 
-    callUpdateTokenUser
+    logOutUser
   };
 
   // Pantalla de carga mientras se verifica la sesión inicial
@@ -214,17 +84,17 @@ export function UserLoggedStatusProvider({ children }) {
 
 // Estilos (mantener al final del archivo)
 const styles = StyleSheet.create({
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 18,
-        color: '#333',
-    }
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 18,
+    color: '#333',
+  }
 });
 
 export function useAuthUser() {
