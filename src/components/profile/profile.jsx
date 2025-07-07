@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, Dimensions } from "react-native";
 import estilos from "./estiloProfile";
-import { useAuthUser } from "../../../hooks/userLogged";
+import { useTokenUser } from "../../../hooks/hookToken";
 import { useNavigation } from "@react-navigation/native";
 
 export default function ProfileCenter() {
   const navigation = useNavigation();
-  const {userData} = useAuthUser();
+  const {userData} = useTokenUser();
   const foto = userData.pfp;
   const usuario = userData.usuario;
   const victorias = userData.wins;

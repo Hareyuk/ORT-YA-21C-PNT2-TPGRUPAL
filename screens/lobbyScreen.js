@@ -6,12 +6,11 @@ import Room from "../src/components/room/room";
 import LoadingScreen from "../src/components/loading/loading";
 import { useNavigation } from "@react-navigation/native";
 import socket from '../src/services/socketService'; // Asegúrate de que esta ruta sea correcta
-import { useAuthUser } from "../hooks/userLogged";
-import { navigate } from "expo-router/build/global-state/routing";
+import { useTokenUser } from "../hooks/hookToken";
 
 export default function LobbyView() {
 
-  const { userData } = useAuthUser();
+  const { userData } = useTokenUser();
   const pfp = userData.pfp;
   const wins = userData.wins;
   const losses = userData.losses;

@@ -14,9 +14,11 @@ import {
 import { useApiHooks } from "../../../hooks/apiHooks.js";
 import { useAuthUser } from "../../../hooks/userLogged.js";
 import estilos from "./estiloEditProfile";
+import { useTokenUser } from "../../../hooks/hookToken.js";
 
 export default function EditProfile({ navigation }) {
-  const { userData, userToken, logOutUser, callUpdateTokenUser } = useAuthUser();
+  const { logOutUser } = useAuthUser();
+  const {userData, setUserToken} = useTokenUser();
   const [usuario, setUsuario] = useState(userData.usuario);
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -126,19 +128,8 @@ export default function EditProfile({ navigation }) {
 
     try {
       const response = await apiPutUpdateUser(userData.id, dataToUpdate);
-      console.log("Respuesta del servidor al actualizar:", response);
-      if (response) {
-        Alert.alert("Perfil actualizado correctamente.");
-        //Actualizar info user
-        callUpdateTokenUser(()=>{navigation.navigate("Profile")});
-        setNewPassword("");
-        setConfirmPassword("");
-        setErrores({});
-        setFormValido(false);
-      } else {
-
-        Alert.alert("No se pudo actualizar el perfil. Intenta de nuevo.");
-      }
+      setUserToken(response.token)
+      navigation.navigate('Home');
     } catch (e) {
       console.error("Error al intentar actualizar perfil:", e);
     }

@@ -79,7 +79,6 @@ export function ApiHooksProvider({ children }) {
   };
 
   const apiPutUpdateUser = async (id, formData) => {
-    
     return fetchPostPut(`${apiUsers}/${id}`, 'PUT', formData);
   };
 

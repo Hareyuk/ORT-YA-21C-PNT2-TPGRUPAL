@@ -60,21 +60,21 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <UserTokenProvider>
-      <ApiHooksProvider>
-        <UserLoggedStatusProvider>
-          <NotificadorProvider> {/* ⬅️ NUEVO ENVOLTORIO */}
-            <NavigationContainer>
-              <SafeAreaView style={[styles.container, cssStyleWeb]}>
-                <Footer />
-                <StackNavigation />
-                <Header />
-              </SafeAreaView>
-            </NavigationContainer>
-          </NotificadorProvider>
-        </UserLoggedStatusProvider>
-      </ApiHooksProvider>
-      </UserTokenProvider>
+     <NavigationContainer>
+        <UserTokenProvider>
+          <ApiHooksProvider>
+            <UserLoggedStatusProvider>
+              <NotificadorProvider> {/* ⬅️ NUEVO ENVOLTORIO */}
+                <SafeAreaView style={[styles.container, cssStyleWeb]}>
+                  <Footer />
+                  <StackNavigation />
+                  <Header />
+                </SafeAreaView>
+              </NotificadorProvider>
+            </UserLoggedStatusProvider>
+          </ApiHooksProvider>
+        </UserTokenProvider>
+      </NavigationContainer>
     </SafeAreaProvider>
   );
 }

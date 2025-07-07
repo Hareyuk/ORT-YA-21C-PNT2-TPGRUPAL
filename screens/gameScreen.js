@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { View, Text, ActivityIndicator, StyleSheet, Button, Alert, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import socket from '../src/services/socketService'; // Asegúrate de que esta ruta sea correcta
-import { useAuthUser } from "../hooks/userLogged";
+import { useTokenUser } from "../hooks/hookToken";
 import LoadingScreen from "../src/components/loading/loading";
-import { ApiHooksProvider } from "../hooks/apiHooks";
+
 export default function GameView() {
   const imageSources = {
   0: require('../assets/img/cardsgame/0.png'),
@@ -27,7 +27,7 @@ export default function GameView() {
   16: require('../assets/img/cardsgame/16.png'),
   17: require('../assets/img/cardsgame/17.png'),
 };
-  const { userData } = useAuthUser();
+  const {userData} = useTokenUser();
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [userLocal, setUserLocal] = useState(null);
