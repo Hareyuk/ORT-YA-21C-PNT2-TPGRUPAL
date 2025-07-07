@@ -19,10 +19,12 @@ import LobbyView from './screens/lobbyScreen';
 import ProfileView from './screens/profileScreen';
 import { NotificadorProvider } from './src/context/NotificadorContext'; // ⬅️ NUEVO IMPORT
 import { UserTokenProvider } from './hooks/hookToken';
+import { useTokenUser } from './hooks/hookToken';
 
 const StackNavigation = () => {
   const Stack = createNativeStackNavigator();
   const navigation = useNavigation();
+  const { userData } = useTokenUser()
 
   const isWeb = !Constants.platform;
   const isAndroid = !!Constants.platform?.android;
@@ -31,7 +33,7 @@ const StackNavigation = () => {
   console.log('isAndroid', isAndroid);
   console.log('isIOS', isIOS);
 
-  
+
   return (
     <Stack.Navigator
       initialRouteName='Home'
@@ -40,14 +42,24 @@ const StackNavigation = () => {
         contentStyle: isWeb ? styles.webContent : null
       }}
     >
-      <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="Login" component={LoginView} />
-      <Stack.Screen name="SignUp" component={SignUpView} />
-      <Stack.Screen name="Lobby" component={LobbyView} />
-      <Stack.Screen name="Game" component={GameView} />
-      <Stack.Screen name="Profile" component={ProfileView} />
-      <Stack.Screen name="EditProfile" component={EditProfileView} />
-      <Stack.Screen name="About" component={AboutView} />
+      {userData ?
+        <>
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Lobby" component={LobbyView} />
+          <Stack.Screen name="Game" component={GameView} />
+          <Stack.Screen name="Profile" component={ProfileView} />
+          <Stack.Screen name="EditProfile" component={EditProfileView} />
+          <Stack.Screen name="About" component={AboutView} />
+        </>
+        :
+        <>
+          <Stack.Screen name="Home" component={Home} />
+          <Stack.Screen name="Login" component={LoginView} />
+          <Stack.Screen name="SignUp" component={SignUpView} />
+          <Stack.Screen name="About" component={AboutView} />
+        </>
+      }
+
     </Stack.Navigator>
   );
 }
@@ -60,7 +72,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-     <NavigationContainer>
+      <NavigationContainer>
         <UserTokenProvider>
           <ApiHooksProvider>
             <UserLoggedStatusProvider>

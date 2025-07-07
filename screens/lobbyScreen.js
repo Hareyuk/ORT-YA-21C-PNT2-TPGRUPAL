@@ -19,13 +19,6 @@ export default function LobbyView() {
   const [isChecked, setChecked] = useState(false); //For private rooms
   const [currentRoomState, setCurrentRoomState] = useState(null);
 
-  useEffect(() => {
-    if (!userData)
-    {
-      //No hay usuario cargado
-      navigation.navigate("Home");
-    }
-  }, []); // Asegura que se ejecuta una vez al cargar la página
 
 
   // --- Lógica de Socket.IO para recibir el estado de la sala ---
