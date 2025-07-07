@@ -4,7 +4,8 @@ import Button from "../src/components/button";
 import { withTheme } from "styled-components";
 import { useTokenUser } from "../hooks/hookToken";
 import { useNavigation } from "@react-navigation/native";
-
+import BigCardPreview from '../src/components/bigCardPreview'
+import SmallCardPreview from '../src/components/smallCardPreview'
 export default function Home() {
 
     const navigation = useNavigation();
@@ -14,19 +15,20 @@ export default function Home() {
 
     const { userData } = useTokenUser();
 
-  const cardPreviews = [{
+  const cardPreviews = [
+  {
     id:"1",
-    text: "piedra",
+    text: "Piedra",
     src: require("../assets/img/card_preview_1.jpg")
   },
   {
     id:"2",
-    text: "tijeras",
+    text: "Tijeras",
     src: require("../assets/img/card_preview_2.jpg")
   },
   {
     id:"3",
-    text: "papel",
+    text: "Papel",
     src: require("../assets/img/card_preview_3.jpg")
   }]; 
   
@@ -50,29 +52,7 @@ export default function Home() {
   { id: 'cd17', src: require('../assets/img/cardsgame/16.png') },
   { id: 'cd18', src: require('../assets/img/cardsgame/17.png') },
 ];
-  const previewCardHTML = (id, text, src)=>{
-    return(
-    <View style={styles.containerCardPreview} key={id}>
-        <Image
-          style={styles.cardPreview}
-          source={src}
-        />
-        <Text style={styles.cardPreviewText}>{text}</Text>
-      </View>
-      );
-  }
 
-  const previewCardGameHTML = (obj)=>{
-    return(
-    <View style={styles.containerCardGamePreview} key={`cg${obj.id}`}>
-        <Image
-          style={styles.cardGamePreview}
-          source={obj.src}
-        />
-      </View>
-      );
-  }
-  
   return (
     <View style={styles.container}>
       <ScrollView style={styles.main} centerContent={true} contentContainerStyle={{ flexGrow: 1 }}>
@@ -102,7 +82,10 @@ export default function Home() {
         </View>
         <View style={styles.sectionCards}>
           <View style={styles.containerPvCards}>
-            {cardPreviews.map((item)=>previewCardHTML(item.id, item.text, item.src))}
+            {cardPreviews.map(
+              (item)=>
+                <BigCardPreview id={item.id} text={item.text} src={item.src}/>
+              )}
           </View>
           <View style={styles.containerPvText}>
             <Text style={styles.title}>Desafía tu estrategia en el duelo definitivo de cartas</Text>
@@ -111,7 +94,10 @@ export default function Home() {
         </View>
         <View style={styles.sectionGalleryCards}>
           <View style={styles.containerPvCardsGame}>
-            {imageCardsArray.map((obj)=>previewCardGameHTML(obj))}
+            {imageCardsArray.map(
+              (item)=>
+                <SmallCardPreview id={item.id} src={item.src}/>
+              )}
           </View>
         </View>
       </ScrollView>
@@ -191,12 +177,6 @@ const styles = StyleSheet.create({
   {
     width: "40%"
   },
-  containerCardPreview:
-  {
-    width: "25%",
-    display: "flex",
-    flexDirection: "column",
-  },
   sectionGalleryCards:
   {
     display: "flex",
@@ -214,32 +194,5 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "space-evenly",
     gap: 12
-  },
-  containerCardGamePreview:
-  {
-    display: "flex",
-    width: "10%",
-    height: "auto",
-  },
-  cardGamePreview:
-  {
-    width: "100%",
-    aspectRatio: 4/5,
-    height: "auto",
-  },
-  cardPreview:
-  {
-    width: "100%",
-    height: "auto",
-    maxHeight: "100%",
-    maxWidth: "100%",
-    aspectRatio: "0.75/1",
-  },
-  cardPreviewText:
-  {
-    color: "#fff",
-    textAlign: "center",
-    fontSize: 22,
-    marginVertical: 16
   }
 });
