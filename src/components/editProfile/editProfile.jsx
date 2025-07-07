@@ -28,7 +28,7 @@ export default function EditProfile({ navigation }) {
 
 
   useEffect(() => {
-    if (isUserLogged && userData) {
+    if (userData) {
       //setUsuario(userData.usuario || "");
       setNewEmail(userData.email || "");
     } else {
@@ -40,7 +40,7 @@ export default function EditProfile({ navigation }) {
       setErrores({});
       setFormValido(false);
     }
-  }, [isUserLogged, userData])
+  }, [userData])
 
   //useEffec para validar cuando cambio algo en el formulario
 
@@ -91,7 +91,7 @@ export default function EditProfile({ navigation }) {
 
   const guardarCambios = async () => {
 
-    if (!isUserLogged || !userData || !userData.id) {
+    if (!userData || !userData.id) {
       Alert.alert("Error", "No se pudo obtener la información del usuario logueado para actualizar.");
       return; // Si esta condición es verdadera, la función termina aquí.
     }
@@ -148,7 +148,7 @@ export default function EditProfile({ navigation }) {
   // --- Lógica de eliminación de cuenta ---
   const handleDeleteAccount = async () => {
 
-    if (!isUserLogged || !userData || !userData.id) {
+    if (!userData || !userData.id) {
         Alert.alert("No se pudo obtener el ID del usuario para eliminar.");
         return;
     }

@@ -27,7 +27,7 @@ export function UserLoggedStatusProvider({ children }) {
         setIsLoadingAuth(true); // Se inicia el proceso de carga
         const data = await AsyncStorage.getData(AUTH_KEY);
         if (data) {
-          setUserToken(data);
+          setUserToken(data);      
         }
       } catch (e) {
         console.error("Error al cargar el token de AsyncStorage:", e);

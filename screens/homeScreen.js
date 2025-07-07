@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, ImageBackground, Image, ScrollView } from "reac
 import { Link } from "expo-router";
 import Button from "../src/components/button";
 import { withTheme } from "styled-components";
-import { useAuthUser } from "../hooks/userLogged";
+import { useTokenUser } from "../hooks/hookToken";
 import { useNavigation } from "@react-navigation/native";
 
 export default function Home() {
@@ -12,7 +12,7 @@ export default function Home() {
         navigation.navigate(route);
     };
 
-    const { isUserLogged } = useAuthUser();
+    const { userData } = useTokenUser();
 
   const cardPreviews = [{
     id:"1",
@@ -80,7 +80,7 @@ export default function Home() {
           <ImageBackground source={require('../assets/img/landing.jpg')} style={styles.landingGameBg}>
             <View style={styles.landingContainerBtns}>
               {
-                isUserLogged
+                userData
                 ?
                 <>
                   <Button cb={()=>handleNavigation('Lobby')}>

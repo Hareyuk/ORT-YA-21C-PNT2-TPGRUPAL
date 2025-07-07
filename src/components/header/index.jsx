@@ -5,6 +5,7 @@ import { useState } from "react";
 import styled from "styled-components/native";
 import { useAuthUser } from "../../../hooks/userLogged";
 import { useNavigation } from "@react-navigation/native";
+import { useTokenUser } from "../../../hooks/hookToken";
 
 const MenuNav = styled.View`
         z-index: 15;
@@ -24,7 +25,8 @@ const MenuNav = styled.View`
 export default function Header() {
     const navigation = useNavigation();
     //Obtener datos del context
-    const { isUserLogged, logOutUser } = useAuthUser();
+    const { logOutUser } = useAuthUser();
+    const { userData } = useTokenUser();
     
     const posXActive = "-350px";
     const posXInactive = "350px";
@@ -55,7 +57,7 @@ export default function Header() {
                     <Pressable onPress={() => handleNavigation('Home')}>
                         <Text style={[styles.whiteText, styles.itemLink]}>Home</Text>
                     </Pressable>
-                   {isUserLogged ? (
+                   {userData ? (
                         <>                         
                             <Pressable onPress={() => handleNavigation('Lobby')}>
                                 <Text style={[styles.whiteText, styles.itemLink]}>Lobby</Text>

@@ -3,7 +3,7 @@ import AsyncStorage from "../src/services/AsyncStorage";
 const AUTH_KEY = '@auth_data';
 import { jwtDecode } from "jwt-decode";
 
-const hookToken= createContext(
+const HookToken= createContext(
     {
       userToken: null, 
       setUserToken:() => { }, 
@@ -19,9 +19,8 @@ export function UserTokenProvider({ children }) {
   useEffect(() => {
       if (userToken) {
         if (userToken.includes('.') && userToken.split('.').length === 3) {
-          try {
+          try {            
             const decoded = jwtDecode(userToken);
-  
             setUserData({
               id: decoded.id,
               usuario: decoded.usuario,
@@ -31,7 +30,7 @@ export function UserTokenProvider({ children }) {
               losses: decoded.losses,
               draws: decoded.draws
             });
-            AsyncStorage.storeData(AUTH_KEY, receivedToken)
+            AsyncStorage.storeData(AUTH_KEY, userToken)
           } catch (decodeError) {
             console.error("Error al decodificar el token JWT:", decodeError);
           }
@@ -53,16 +52,16 @@ export function UserTokenProvider({ children }) {
 
   
   return (
-    <UserTokenProvider.Provider value={value}>
+    <HookToken.Provider value={value}>
       {children}
-    </UserTokenProvider.Provider>
+    </HookToken.Provider>
   );
 
 
 }
 
 export function useTokenUser() {
-  const context = useContext(hookToken);
+  const context = useContext(HookToken);
   if (!context) {
     throw new Error("hookToken must be used within UserTokenProvider");
   }

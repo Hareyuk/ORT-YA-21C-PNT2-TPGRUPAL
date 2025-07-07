@@ -1,3 +1,5 @@
+const apiBase = process.env.EXPO_PUBLIC_API_URL;
+
 // Helper for POST/PUT requests with JSON body
   export const fetchPostPut = async (endpointPath, method, bodyObj) => {
     const url = `${apiBase}${endpointPath}`;
