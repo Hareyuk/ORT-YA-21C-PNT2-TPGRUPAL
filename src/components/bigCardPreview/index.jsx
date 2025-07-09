@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, Image } from "react-native";
 
-const BigCardPreview = ({id, text, src }) => {
+const BigCardPreview = ({text, src }) => {
   return (
-    <View style={styles.containerCardPreview} key={id}>
+    <View style={styles.containerCardPreview}>
         <Image
           style={styles.cardPreview}
           source={src}

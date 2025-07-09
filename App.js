@@ -59,7 +59,6 @@ const StackNavigation = () => {
           <Stack.Screen name="About" component={AboutView} />
         </>
       }
-
     </Stack.Navigator>
   );
 }
@@ -68,7 +67,7 @@ export default function App() {
   const isWeb = !Constants.platform;
   const isAndroid = !!Constants.platform?.android;
   const isIOS = !!Constants.platform?.ios;
-  const cssStyleWeb = isWeb ? styles.webContainer : null;
+  const cssStyleWeb = isWeb ? styles.webContainer : styles.mobileContainer;
 
   return (
     <SafeAreaProvider>
@@ -76,13 +75,12 @@ export default function App() {
         <UserTokenProvider>
           <ApiHooksProvider>
             <UserLoggedStatusProvider>
-              <NotificadorProvider> {/* ⬅️ NUEVO ENVOLTORIO */}
-                <SafeAreaView style={[styles.container, cssStyleWeb]}>
-                  <Footer />
-                  <StackNavigation />
-                  <Header />
-                </SafeAreaView>
-              </NotificadorProvider>
+              <SafeAreaView style={[styles.container, cssStyleWeb]}>
+                {isWeb && <Footer/>}
+                <StackNavigation />
+                <Header />
+                {isIOS || isAndroid && <StatusBar style="auto" />}
+              </SafeAreaView>
             </UserLoggedStatusProvider>
           </ApiHooksProvider>
         </UserTokenProvider>
@@ -100,6 +98,11 @@ const styles = StyleSheet.create({
     flexDirection: "column-reverse"
   },
   webContainer: {
+    width: '100%',
+    maxWidth: '100%',
+    alignItems: 'stretch',
+  },
+  mobileContainer: {
     width: '100%',
     maxWidth: '100%',
     alignItems: 'stretch',

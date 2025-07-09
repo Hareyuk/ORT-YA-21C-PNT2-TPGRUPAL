@@ -8,7 +8,7 @@ const API_CARDS = process.env.EXPO_PUBLIC_API_CARDS;
 const API_GAME = process.env.EXPO_PUBLIC_API_GAME;
 const API_USERS = process.env.EXPO_PUBLIC_API_USERS;
 
-const SOCKET_SERVER_URL = 'http://localhost:8080';
+const SOCKET_SERVER_URL = API_URL;
 const socket = io(SOCKET_SERVER_URL,
   {
     transports: ["websocket"]

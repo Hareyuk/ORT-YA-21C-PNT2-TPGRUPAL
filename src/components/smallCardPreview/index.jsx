@@ -1,8 +1,8 @@
 import { StyleSheet, View, Image } from "react-native";
 
-const SmallCardPreview = ({src, id}) => {
+const SmallCardPreview = ({src}) => {
   return (
-    <View style={styles.containerCardGamePreview} key={`cg${id}`}>
+    <View style={styles.containerCardGamePreview}>
       <Image
         style={styles.cardGamePreview}
         source={src}

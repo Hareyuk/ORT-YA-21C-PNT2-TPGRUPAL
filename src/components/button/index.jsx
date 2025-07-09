@@ -1,11 +1,11 @@
 import { Link } from "expo-router";
 import { ImageBackground, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const Button = ({ children, cb }) => {
+export function Button({ texto, cb }){
   return (
     <Pressable style={[styles.generalButton]} onPress={cb}>
         <ImageBackground source={require('../../../assets/img/ui_button.png')} style={styles.img_ui}>       
-            <Text style={[styles.txtButton]}>{children}</Text>
+            <Text style={[styles.txtButton]}>{texto}</Text>
         </ImageBackground>
     </Pressable>
   );

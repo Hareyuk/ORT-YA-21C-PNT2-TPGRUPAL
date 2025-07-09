@@ -112,15 +112,15 @@ export default function LobbyView() {
               <Text style={{display: "block", textAlign: "center"}}>Derrotas: {losses}</Text>
             </Text>
           </View>
-          <Button cb={onPlayRandom}>Jugar cualquier partida</Button>
+          {/* <Button cb={onPlayRandom}>Jugar cualquier partida</Button> */}
         </View>
         <View style={styles.listRooms}>
           <View style={styles.containerListRooms}>
             <View style={styles.containerHorizontalContent}>
               <Text style={[styles.whiteText, styles.textInfo]}>Buscar sala</Text>
               <TextInput style={styles.inputTxt}></TextInput>
-              <Button cb={onSearchRoom}>Buscar</Button>
-              <Button cb={onUpdateRooms}>Actualizar salas</Button>
+              {/* <Button cb={onSearchRoom}>Buscar</Button>
+              <Button cb={onUpdateRooms}>Actualizar salas</Button> */}
             </View>
             <View style={styles.displayListRooms}>
               {/* Aquí renderizamos la "sala única" del backend */}
@@ -142,7 +142,7 @@ export default function LobbyView() {
                 <Text style={[styles.whiteText, styles.textInfo]}>Privado</Text>
                 <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} />
               </View>
-              <Button cb={onCreateRoom}>Crear sala</Button>
+              {/* <Button cb={onCreateRoom}>Crear sala</Button> */}
             </View>
           </View>
         </View>

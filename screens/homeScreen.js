@@ -63,18 +63,12 @@ export default function Home() {
                 userData
                 ?
                 <>
-                  <Button cb={()=>handleNavigation('Lobby')}>
-                    Ingresar al lobby
-                  </Button>
+                  <Button cb={()=>handleNavigation('Lobby')} texto="Ingresar al lobby"/>
                 </>
                 :
                 <>
-                  <Button cb={()=>handleNavigation('SignUp')}>
-                    Registrarse
-                  </Button>
-                  <Button cb={()=>handleNavigation('Login')}>
-                    Iniciar sesión
-                  </Button>
+                  <Button cb={()=>handleNavigation('SignUp')} texto="Registrarse"/>
+                  <Button texto="Iniciar sesión" cb={()=>handleNavigation('Login')}/>
                 </>
               }
             </View>
@@ -84,7 +78,7 @@ export default function Home() {
           <View style={styles.containerPvCards}>
             {cardPreviews.map(
               (item)=>
-                <BigCardPreview id={item.id} text={item.text} src={item.src}/>
+                <BigCardPreview key={item.id} text={item.text} src={item.src}/>
               )}
           </View>
           <View style={styles.containerPvText}>
@@ -96,7 +90,7 @@ export default function Home() {
           <View style={styles.containerPvCardsGame}>
             {imageCardsArray.map(
               (item)=>
-                <SmallCardPreview id={item.id} src={item.src}/>
+                <SmallCardPreview key={`cg${item.id}`} src={item.src}/>
               )}
           </View>
         </View>
