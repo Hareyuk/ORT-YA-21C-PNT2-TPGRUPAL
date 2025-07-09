@@ -1,18 +1,8 @@
 import { useContext, createContext } from "react";
 import { fetchPostPut, fetchGet } from "./hookFetch";
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
-const API_CARDS = process.env.EXPO_PUBLIC_API_CARDS;
-
-const API_GAME = process.env.EXPO_PUBLIC_API_GAME;
-const API_USERS = process.env.EXPO_PUBLIC_API_USERS;
 
 const ApiHooksContext = createContext({
-  //API ROOMS
-  apiJoinRoom: () => {},
-  apiSendSelectedOrderCards: () => {},
-  apiPlayRound: () => {},
-  apiPlayNextRound: () => {},
-  apiGetRoom: () => {},
+  
   //API USERS
   apiGetUserById: () => {},
   apiGetUsers: () => {},
@@ -27,35 +17,8 @@ const ApiHooksContext = createContext({
 export function ApiHooksProvider({ children }) {
   const apiBase = process.env.EXPO_PUBLIC_API_URL;
   const apiUsers = process.env.EXPO_PUBLIC_API_USERS;
-  const apiRooms = process.env.EXPO_PUBLIC_API_CARDS;
-  const apiCards = process.env.EXPO_PUBLIC_API_GAME;
+  
 
-// API ROOMS 
-  const apiJoinRoom = async (id, user) => {
-    return fetchPostPut(`${apiCards}/unirse`, 'POST', {
-      id,
-      usuario: user,
-    });
-  };
-
-  const apiSendSelectedOrderCards = async (id, orderCards) => {
-    return fetchPostPut(`${apiCards}/ordenar`, 'POST', {
-      id,
-      nuevoOrden: orderCards,
-    });
-  };
-
-  const apiPlayRound = async () => {
-    return fetchPostPut(`${apiCards}/jugar`, 'POST', {});
-  };
-
-  const apiPlayNextRound = async () => {
-    return fetchPostPut(`${apiCards}/siguiente`, 'POST', {});
-  };
-
-  const apiGetRoom = async () => {
-    return fetchGet(`${apiCards}/sala`);
-  };
 
   // API USERS
   const apiGetUserById = async (id) => {
@@ -85,12 +48,7 @@ export function ApiHooksProvider({ children }) {
   
 
   const value = {
-    //API ROOMS
-    apiJoinRoom,
-    apiSendSelectedOrderCards,
-    apiPlayRound,
-    apiPlayNextRound,
-    apiGetRoom,
+    
     //API USERS
     apiGetUserById,
     apiGetUsers,
