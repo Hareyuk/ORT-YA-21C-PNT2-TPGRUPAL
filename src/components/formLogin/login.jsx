@@ -22,6 +22,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [usuarioTocado, setUsuarioTocado] = useState(false);
   const [contrasenaTocada, setContrasenaTocada] = useState(false);
+  const [errorLogin, setErrorLogin] = useState(false)
 
 
   const { logInUser } = useAuthUser();
@@ -42,6 +43,7 @@ export default function Login() {
     }
 
     setErrores(nuevosErrores);
+    setErrorLogin(false)
     setFormValido(Object.keys(nuevosErrores).length === 0);
     return Object.keys(nuevosErrores).length === 0;
   };
@@ -56,11 +58,11 @@ export default function Login() {
       const data = { usuario: usuario, contrasenia: contrasena };
       await logInUser(data);
       setIsLoading(false);
+      console.log('Data recibido: ', data);
       navigation.navigate("Home");
     } catch (e) {
       setIsLoading(false);
-      console.log("no pudo ingresarse al usuario")
-      // Mostrar mensaje de error (podés agregar un Toast o mensaje en pantalla)
+      setErrorLogin("No pudo ingresarse al usuario")
     }
   };
 
@@ -105,6 +107,10 @@ export default function Login() {
       />
       {errores.contrasena && contrasenaTocada && (
         <Text style={{ color: "red" }}>{errores.contrasena}</Text>
+      )}
+
+      {errorLogin && (
+        <Text style={{ color: "red" }}>{errorLogin}</Text>
       )}
 
 

@@ -48,7 +48,7 @@ export function UserLoggedStatusProvider({ children }) {
       setUserToken(response.token)
       success = true;
     } catch (e) {
-      console.error("ERROR LOGIN (en logInUser): ", e);
+      throw new Error("ERROR LOGIN (en logInUser): ", e)
     }
     return success;
 
