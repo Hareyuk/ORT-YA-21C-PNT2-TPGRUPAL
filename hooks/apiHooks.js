@@ -20,7 +20,7 @@ const ApiHooksContext = createContext({
   apiPostCreateUser: () => {},
   apiPutUpdateUser: () => {},
   apiDeleteUser: () => {},
-  apiGetNewToken: ()=>{},
+  
   //API CARDS
 });
 
@@ -70,10 +70,6 @@ export function ApiHooksProvider({ children }) {
     return fetchPostPut(`${apiUsers}/login`, 'POST', formData);
   };
 
-  const apiGetNewToken = async (id) => { 
-    return fetchPostPut(`${apiUsers}/getnewtoken`, 'POST', { id: id });
-  };
-
   const apiPostCreateUser = async (formData) => {
     return fetchPostPut(apiUsers, 'POST', formData);
   };
@@ -101,8 +97,7 @@ export function ApiHooksProvider({ children }) {
     apiPostLoginuser,
     apiPostCreateUser,
     apiPutUpdateUser,
-    apiDeleteUser,
-    apiGetNewToken
+    apiDeleteUser
     //API CARDS
   };
 
