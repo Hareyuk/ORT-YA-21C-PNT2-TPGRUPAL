@@ -4,7 +4,7 @@ import styles from "./styles";
 export default function LoadingScreen(props) {
     const { text, isLoading } = props;
 
-    if(!isLoading) return ("");
+    if(!isLoading) return null;
 
     return (
         <View style={styles.wrapperLoading}>

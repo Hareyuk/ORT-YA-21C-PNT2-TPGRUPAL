@@ -1,266 +1,149 @@
-
 import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator, StyleSheet, Button, Alert, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Button, Alert, Image, TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import socket from '../src/services/socketService'; // Asegúrate de que esta ruta sea correcta
 import { useTokenUser } from "../hooks/hookToken";
 import LoadingScreen from "../src/components/loading/loading";
+import useGameSocket from "../hooks/useGameSocket";
+//import styles from "../src/styles/stylesGameView"; // Asegúrate de tener este archivo o define tus estilos
 
 export default function GameView() {
   const imageSources = {
-  0: require('../assets/img/cardsgame/0.png'),
-  1: require('../assets/img/cardsgame/1.png'),
-  2: require('../assets/img/cardsgame/2.png'),
-  3: require('../assets/img/cardsgame/3.png'),
-  4: require('../assets/img/cardsgame/4.png'),
-  5: require('../assets/img/cardsgame/5.png'),
-  6: require('../assets/img/cardsgame/6.png'),
-  7: require('../assets/img/cardsgame/7.png'),
-  8: require('../assets/img/cardsgame/8.png'),
-  9: require('../assets/img/cardsgame/9.png'),
-  10: require('../assets/img/cardsgame/10.png'),
-  11: require('../assets/img/cardsgame/11.png'),
-  12: require('../assets/img/cardsgame/12.png'),
-  13: require('../assets/img/cardsgame/13.png'),
-  14: require('../assets/img/cardsgame/14.png'),
-  15: require('../assets/img/cardsgame/15.png'),
-  16: require('../assets/img/cardsgame/16.png'),
-  17: require('../assets/img/cardsgame/17.png'),
-};
-  const {userData} = useTokenUser();
+    0: require('../assets/img/cardsgame/0.png'),
+    1: require('../assets/img/cardsgame/1.png'),
+    2: require('../assets/img/cardsgame/2.png'),
+    3: require('../assets/img/cardsgame/3.png'),
+    4: require('../assets/img/cardsgame/4.png'),
+    5: require('../assets/img/cardsgame/5.png'),
+    6: require('../assets/img/cardsgame/6.png'),
+    7: require('../assets/img/cardsgame/7.png'),
+    8: require('../assets/img/cardsgame/8.png'),
+    9: require('../assets/img/cardsgame/9.png'),
+    10: require('../assets/img/cardsgame/10.png'),
+    11: require('../assets/img/cardsgame/11.png'),
+    12: require('../assets/img/cardsgame/12.png'),
+    13: require('../assets/img/cardsgame/13.png'),
+    14: require('../assets/img/cardsgame/14.png'),
+    15: require('../assets/img/cardsgame/15.png'),
+    16: require('../assets/img/cardsgame/16.png'),
+    17: require('../assets/img/cardsgame/17.png'),
+  };
+
+  const { userData } = useTokenUser();
   const navigation = useNavigation();
+
+  // Estados principales
   const [isLoading, setIsLoading] = useState(false);
+  const [salaEstado, setSalaEstado] = useState(null);
+  const [cardsPlayerLocal, setCardsPlayerLocal] = useState(null);
+  const [cardsPlayerEnemy, setCardsPlayerEnemy] = useState(null);
+
+  // Estados de usuario y cartas
   const [userLocal, setUserLocal] = useState(null);
   const [userEnemy, setUserEnemy] = useState(null);
-  const [availableCards, setAvailableCards] = useState([]) //Elegidas van a CardsPlayerOrder
-  const [orderedCards, setOrderedCards] = useState([])
-  const [hasSubmittedOrder, setHasSubmittedOrder] = useState(false) //inmovible apenas tenga true
-  const [salaEstado, setSalaEstado] = useState(null)
-  const [cardsPlayerLocal, setCardsPlayerLocal] = useState(null)
-  const [cardsPlayerEnemy, setCardsPlayerEnemy] = useState(null)
-  // --- Lógica de Socket.IO para recibir el estado del juego ---
+  const [availableCards, setAvailableCards] = useState([]);
+  const [orderedCards, setOrderedCards] = useState([]);
+  const [hasSubmittedOrder, setHasSubmittedOrder] = useState(false);
+
+  // Hook de conexión por socket
+  const { sendOrderCards, playerEmitExit } = useGameSocket({
+  userData,
+  setSalaEstado,
+  setCardsPlayerLocal,
+  setCardsPlayerEnemy,
+  navigation,
+  setIsLoading,
+});
+
   useEffect(() => {
-    
-      // Ahora sí pide al armarse este emit de recibir sala 
-    socket.emit('SOLICITAR_SALA_INICIAL');
-
-    socket.on('BATALLA_RONDA',(room)=>
-    {
-      if(room.estado === "cartas-ordenadas" || room.estado === "partida-finalizada") //partida-finalizada agregado  de último momento por cambios de estructura
-      {
-        console.log('QUE EMPIECE EL ENFRENTAMIENTO DE CARTAS');
-        const local = room.jugadores.find(j => j.id === userData.id);
-        const enemy = room.jugadores.find(j => j.id !== userData.id);
-        setCardsPlayerLocal(local.cartas)
-        setCardsPlayerEnemy(enemy.cartas)
-        setSalaEstado(room);
-        console.log('cartas de jugador loca: ', local.cartas);
-        setIsLoading(false);
-      }
-      else
-      {
-        console.log(room);
-        console.log('Falta un jugador todavía');
-      }
-    })
-
-    socket.on('FIN_DE_PARTIDA', ()=>
-    {
-      console.log('Terminó partida, a irse bye');
-      playerExitRoom();
-    })
-    
-    // Escuchar el estado de la sala actualizado
-    socket.on('ESTADO_SALA_ACTUALIZADO', (sala) => {
-      console.log('GameView - Estado de la sala actualizado:', sala);
-      setSalaEstado(sala);
-      // Lógica para el fin del juego por desconexión
-      if (sala.estado === 'juego-finalizado' && sala.ganador) {
-        if (sala.ganador === salaEstado.jugadorActual.id) { 
-          Alert.alert('VICTORIA', `¡Has ganado la partida! El otro jugador se desconectó.`);
-        }
-        else
-        {
-          Alert.alert('DERROTA', `Has perdido la partida.`);
-        }
-        setIsLoading(false);
-        // Puedes navegar de nuevo al Lobby o Home después de un breve retraso
-        //setTimeout(() => navigation.replace('Lobby'), 3000);
-      }
-    });
-
-    socket.on()
-
-    // Manejar errores que el backend envíe por socket
-    socket.on('ERROR', (error) => {
-        console.error('GameView - Error del servidor:', error);
-        Alert.alert('Error del Servidor', error.mensaje || 'Ha ocurrido un error en el juego.');
-    });
-
-    // Limpiar listeners al desmontar el componente
-    return () => {
-      socket.off('ESTADO_SALA_ACTUALIZADO');
-      socket.off('ERROR');
-    };
-  }, [navigation]);
-  // --- Funciones para enviar acciones al Backend ---
-  const handleOrdenarCartas = () => {
-    if (!salaEstado || !userData.id) return Alert.alert('Error', 'No hay datos de sala o usuario.');
-
-    const jugadorActual = salaEstado.jugadores.find(j => j.id === userData.id);
-    if (!jugadorActual || jugadorActual.ordenadas) {
-        return Alert.alert('Info', 'Ya ordenaste tus cartas o no eres un jugador activo.');
+    if (salaEstado) {
+      const local = salaEstado.jugadores.find(j => j.id === userData.id);
+      const enemy = salaEstado.jugadores.find(j => j.id !== userData.id);
+      setUserLocal(local);
+      setUserEnemy(enemy);
     }
+  }, [salaEstado]);
 
-    // EJEMPLO: Ordenar cartas al azar para probar. En un juego real, la UI
-    // permitiría al usuario arrastrar y soltar las cartas para definir el nuevoOrden.
-    // Esto es solo un placeholder: deberías obtener el orden real de tus cartas en la UI.
-    //const nuevoOrden = [...jugadorActual.cartas].sort(() => Math.random() - 0.5).map(c => c.id);
-    console.log(`[GameView] Enviando ORDENAR_CARTAS para ${userData.id}:`, nuevoOrden);
-    socket.emit('ORDENAR_CARTAS', { id: userData.id, nuevoOrden: orderedCards });
-  };
-
-  const handleEnfrentarCartas = () => {
-    if (!salaEstado || salaEstado.estado !== 'cartas-ordenadas') {
-      return Alert.alert('Info', 'Las cartas aún no están ordenadas por ambos jugadores.');
+  useEffect(() => {
+    if (userLocal) {
+      setAvailableCards(userLocal.cartas || []);
     }
-    console.log('[GameView] Enviando ENFRENTAR_CARTAS');
-    socket.emit('ENFRENTAR_CARTAS');
-  };
+  }, [userLocal]);
 
-  const handleAvanzarRonda = () => {
-    if (!salaEstado || salaEstado.estado !== 'partida-finalizada') {
-      return Alert.alert('Info', 'La partida no ha finalizado para avanzar de ronda.');
-    }
-    console.log('[GameView] Enviando AVANZAR_RONDA');
-    socket.emit('AVANZAR_RONDA');
-  };
-
-  //https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+  // Funciones de cartas
   const getShuffledArr = arr => {
-    const newArr = arr.slice()
+    const newArr = arr.slice();
     for (let i = newArr.length - 1; i > 0; i--) {
-        const rand = Math.floor(Math.random() * (i + 1));
-        [newArr[i], newArr[rand]] = [newArr[rand], newArr[i]];
+      const rand = Math.floor(Math.random() * (i + 1));
+      [newArr[i], newArr[rand]] = [newArr[rand], newArr[i]];
     }
-    return newArr
-};
+    return newArr;
+  };
 
-  const generateRandomOrder = ()=>
-  {
+  const generateRandomOrder = () => {
     const fullArray = [...availableCards, ...orderedCards];
     const shuffled = getShuffledArr(fullArray);
     setAvailableCards([]);
     setOrderedCards(shuffled);
-  }
+  };
 
-  const sendOrderCards = ()=>
-  {
-    setIsLoading(true);
-    /* console.log("ENVIAR CARTAS");
-    console.log("ID: ", userData.id);
-    console.log("nuevoOrden: ", orderedCards); */
-    setHasSubmittedOrder(true);
-    socket.emit('CARTAS_ORDENADAS_ENVIADO', { id: userData.id, nuevoOrden: orderedCards });
-  }
+  const selectOrderCardIndividual = pos => {
+    const card = availableCards[pos];
+    setOrderedCards([...orderedCards, card]);
+    setAvailableCards(availableCards.filter((_, idx) => idx !== pos));
+  };
 
-  const selectOrderCardIndividual = (pos_card)=>
-  {
-    const card = availableCards[pos_card];
-    const updatedSelectedCards = [...orderedCards, card];
-    const updatedCardsPlayer = availableCards.filter((_, idx) => idx !== pos_card);
-    setAvailableCards(updatedCardsPlayer);
-    setOrderedCards(updatedSelectedCards);
-  }
+  const removeOrderCardIndividual = pos => {
+    const card = orderedCards[pos];
+    setAvailableCards([...availableCards, card]);
+    setOrderedCards(orderedCards.filter((_, idx) => idx !== pos));
+  };
 
-  const removeOrderCardIndividual = (pos_card)=>
-  {
-    const card = orderedCards[pos_card];
-    const updatedCards = [...availableCards, card];
-    const updatedCardsPlayerSelected = orderedCards.filter((_, idx) => idx !== pos_card);
-    setAvailableCards(updatedCards);
-    setOrderedCards(updatedCardsPlayerSelected);
-  }
+  const aceptarOrdenCartas = () => {
+  setHasSubmittedOrder(true);
+  setIsLoading(true);
+  sendOrderCards(orderedCards);
+};
 
-  useEffect(() => {
-      if(salaEstado)
-      {
-        /* console.log("LOG ESTADO:");
-        console.log(salaEstado); */
-        setUserLocal(salaEstado.jugadores.find(j => j.id === userData.id));
-        setUserEnemy(salaEstado.jugadores.find(j => j.id !== userData.id));
-      }
-  }, [salaEstado])
-
-  useEffect(()=>
-  {
-    if(userLocal)
-    {
-      setAvailableCards(userLocal.cartas)
-    }
-  }, [userLocal])
-
-  const renderIndividualResultFightCards=(typePlayer, typeRival)=>
-  {
+  // Render lógica
+  const renderIndividualResultFightCards = (typePlayer, typeRival) => {
     let resultado = '';
-    const PIEDRA = 'piedra';
-    const TIJERA = 'tijera';
-    const PAPEL = 'papel'
-    if(typePlayer === typeRival) resultado = 'draw';
-    if (typePlayer === PIEDRA)
-    {
-      if(typeRival === TIJERA) resultado = 'win';
-      if(typeRival === PAPEL) resultado = 'lose';
-    } 
-    if (typePlayer === PAPEL)
-    {
-      if(typeRival === PIEDRA) resultado = 'win';
-      if(typeRival === TIJERA) resultado = 'lose';
-    } 
-    if (typePlayer === TIJERA)
-    {
-      if(typeRival === PAPEL) resultado = 'win';
-      if(typeRival === PIEDRA) resultado = 'lose';
-    }
-    let src;
-    if(resultado==='win') src=(require('../assets/img/match_win.png'));
-    if(resultado==='lose') src=(require('../assets/img/match_loss.png'));
-    if(resultado==='draw') src=(require('../assets/img/match_draw.png'));
-    return(<Image style={styles.imgResult} source={src} />)
-  }
+    if (typePlayer === typeRival) resultado = 'draw';
+    if (typePlayer === 'piedra' && typeRival === 'tijera') resultado = 'win';
+    if (typePlayer === 'piedra' && typeRival === 'papel') resultado = 'lose';
+    if (typePlayer === 'papel' && typeRival === 'piedra') resultado = 'win';
+    if (typePlayer === 'papel' && typeRival === 'tijera') resultado = 'lose';
+    if (typePlayer === 'tijera' && typeRival === 'papel') resultado = 'win';
+    if (typePlayer === 'tijera' && typeRival === 'piedra') resultado = 'lose';
 
-  const renderResultsRound=()=>
-  {
-    if(cardsPlayerEnemy == null)
-    return (<></>);
-    console.log(salaEstado);
-    console.log(salaEstado.ganador);
-    
-    return(
-      <>
-        <View style={styles.playerSection}>
-          {/* <Text style={styles.textInfo}>Ronda {salaEstado.ronda}</Text>
-            <Text style={styles.textInfo}>{salaEstado.ganador == 'empate' ? "Empate"
-            : salaEstado.ganador == userLocal.id ? "¡Has ganado!" : "Has perdido"}</Text> */}
-            {/* Render enemy cards */}
-            <View style={styles.cardsPlayerContainer}>
-              <Text style={styles.playerName}>{userEnemy.usuario.usuario.usuario}</Text>
-              <View style={styles.cardsContainer}>
-                {cardsPlayerEnemy.map((card, i) => (
-                  <View key={`cards-enemy-${i}`} style={styles.cardContainer}>
+    let src = null;
+    if (resultado === 'win') src = require('../assets/img/match_win.png');
+    if (resultado === 'lose') src = require('../assets/img/match_loss.png');
+    if (resultado === 'draw') src = require('../assets/img/match_draw.png');
+    return (<Image style={styles.imgResult} source={src} />);
+  };
+
+  const renderResultsRound = () => {
+    if (cardsPlayerEnemy == null) return (<></>);
+
+    return (
+      <View style={styles.playerSection}>
+        <View style={styles.cardsPlayerContainer}>
+          <Text style={styles.playerName}>{userEnemy.usuario.usuario.usuario}</Text>
+          <View style={styles.cardsContainer}>
+            {cardsPlayerEnemy.map((card, i) => (
+              <View key={`cards-enemy-${i}`} style={styles.cardContainer}>
                     <View style={styles.selectedCardContainer}>
                       <Image style={styles.imgCard} source={imageSources[card.id]} />
                     </View>
                   </View>
-                ))}
-              </View>
-            </View>
-            {/* Render results */}
-            <View style={styles.cardsPlayerContainer}>
-              <View style={styles.cardsContainer}>
-                {
-                  cardsPlayerLocal.map((cardPlayer, i)=>
-                  {
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.cardsPlayerContainer}>
+          <View style={styles.cardsContainer}>
+            {cardsPlayerLocal.map((cardPlayer, i) => 
+            {
                     const typeCardPlayer = cardPlayer.tipo;
                     const typeCardRival = cardsPlayerEnemy[i].tipo;  
                     return(
@@ -269,130 +152,89 @@ export default function GameView() {
                       </View>
                     )})
                 }
-              </View>
-            </View>
-            {/* Render local player cards */}
-            <View style={styles.cardsPlayerContainer}>
-              <View style={styles.cardsContainer}>
-                {cardsPlayerLocal.map((card, i) => (
-                  <View key={`cards-local-${i}`} style={styles.cardContainer}>
+          </View>
+        </View>
+
+        <View style={styles.cardsPlayerContainer}>
+          <View style={styles.cardsContainer}>
+            {cardsPlayerLocal.map((card, i) => (
+             <View key={`cards-local-${i}`} style={styles.cardContainer}>
                     <View style={styles.selectedCardContainer}>
                       <Image style={styles.imgCard} source={imageSources[card.id]} />
                     </View>
                   </View>
                 ))}
-              </View>
-              <Text style={styles.playerName}>{userLocal.usuario.usuario.usuario}</Text>
-            </View>
-            <TouchableOpacity style={styles.boton} onPress={()=>playerEmitExit()}>
-              <Text style={styles.textoBoton}>Volver al lobby</Text>
-            </TouchableOpacity>
           </View>
-      </>
-    )
-  }
-
-  const playerExitRoom = ()=>
-  {
-    setSalaEstado(null);
-    setCardsPlayerLocal(null);
-    setCardsPlayerEnemy(null);
-    setUserLocal(null);
-    setUserEnemy(null);
-    navigation.navigate("Lobby");
-  }
-
-  const playerEmitExit = ()=>
-  {
-    socket.emit('SALIR_SALA', { id: userData.id });
-  }
-
-  const renderPlayingGame=()=>
-  {
-    if(!userEnemy || cardsPlayerLocal != null)
-    return(<></>)
-    
-    return(
-      <>
-        <View style={styles.playerSection}>
-          <Text style={styles.playerName}>{userEnemy.cartas.length} cartas de {userEnemy.usuario.usuario.usuario}</Text>
+          <Text style={styles.playerName}>{userLocal.usuario.usuario.usuario}</Text>
         </View>
-        <View style={styles.playerSection}>
-          <Text style={styles.playerName}>Tus Cartas ({availableCards.length}):</Text>
-          <View style={styles.cardsContainer}>
-            {orderedCards.length > 0 && orderedCards.map((card, i) => (
-              <View key={`key-cards-${i}`} style={styles.cardContainer}>
-                {/* <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text> */}
-                <View style={styles.selectedCardContainer}>
-                  <Image style={styles.darkCard} source={imageSources[card.id]} />
-                  <Text style={[styles.whiteText, styles.textSelected]}>{i + 1}</Text>
-                </View>
-                <Button title="Eliminar orden" onPress={()=>removeOrderCardIndividual(i)} />
-              </View>
-            ))}
-            {availableCards.length > 0 && availableCards.map((card, i) => (
-              <>
-                <View key={`available-cards-${i}`} style={styles.cardContainer}>
-                  {/* <Text key={card.id} style={styles.card}>id: {card.id} - tipo: {card.tipo}</Text> */}
-                  <Image style={styles.imgCard} source={imageSources[card.id]} />
-                  <Button title="Seleccionar" onPress={()=>selectOrderCardIndividual(i)} />
-                  {/* <Text>Sin orden</Text> */}
-                </View>
-              </>
-            ))}
-          </View>
-          <Text>Cartas ordenadas: {orderedCards[orderedCards.length-1] ? 'Sí' : 'No'}</Text>
-          <Button title="Ordernar aleatoriamente" onPress={generateRandomOrder} />
-          {(!hasSubmittedOrder && orderedCards && orderedCards.length == 9) ? (
-              <Button title="Aceptar orden de cartas" onPress={sendOrderCards} />
-          ) : (
-            <Button title="Aceptar orden de cartas" disabled />
-          )}
-        </View>
-      </>
-    )
-  }
 
-  // Renderizado principal de la pantalla de juego
-  if(!salaEstado || !userLocal || !availableCards)
-  {
-    return(
-      <View>
-        <LoadingScreen isLoading={isLoading} text="Preparando sala..."/>
+        <TouchableOpacity style={styles.boton} onPress={playerEmitExit}>
+          <Text style={styles.textoBoton}>Volver al lobby</Text>
+        </TouchableOpacity>
       </View>
-    )
+    );
+  };
+
+  const renderPlayingGame = () => {
+    if (!userEnemy || cardsPlayerLocal != null) return null;
+
+    return (
+      <View style={styles.playerSection}>
+        <Text style={styles.playerName}>Cartas de {userEnemy.usuario.usuario.usuario}</Text>
+        <Text style={styles.playerName}>Tus Cartas ({availableCards.length})</Text>
+        <View style={styles.cardsContainer}>
+          {orderedCards.map((card, i) => (
+            <View key={i} style={styles.cardContainer}>
+              <Image style={styles.darkCard} source={imageSources[card.id]} />
+              <Text style={[styles.whiteText, styles.textSelected]}>{i + 1}</Text>
+              <Button title="Eliminar orden" onPress={() => removeOrderCardIndividual(i)} />
+            </View>
+          ))}
+          {availableCards.map((card, i) => (
+            <View key={i} style={styles.cardContainer}>
+              <Image style={styles.imgCard} source={imageSources[card.id]} />
+              <Button title="Seleccionar" onPress={() => selectOrderCardIndividual(i)} />
+            </View>
+          ))}
+        </View>
+        <Text>Cartas ordenadas: {orderedCards.length === 9 ? "Sí" : "No"}</Text>
+        <Button title="Ordenar aleatoriamente" onPress={generateRandomOrder} />
+        {(!hasSubmittedOrder && orderedCards.length === 9) ? (
+          <Button title="Aceptar orden de cartas" onPress={aceptarOrdenCartas} />
+        ) : (
+          <Button title="Aceptar orden de cartas" disabled />
+        )}
+      </View>
+    );
+  };
+
+  if (!salaEstado || !userLocal || !availableCards) {
+    return (
+      <View>
+        <LoadingScreen isLoading={isLoading} text="Preparando sala..." />
+      </View>
+    );
   }
+
   return (
     <View style={styles.container}>
-{/*       <Text style={styles.title}>Pantalla videojuego - {userData.usuario.usuario}</Text>
-      <Text>Estado de la Sala: {salaEstado.estado}</Text>
-      <Text>Ronda: {salaEstado.ronda}</Text> */}
-
       {salaEstado.jugadores.length < 2 && <Text>Esperando más jugadores...</Text>}
       {salaEstado.estado === 'partida-finalizada' && salaEstado.resultado && (
         <View style={styles.resultsSection}>
-          <Text>{userLocal.usuario.usuario.usuario} {userLocal.usuario.id === salaEstado.ganador ? " ha ganado" : "ha pedido"}</Text>
-          <Text>{userEnemy.usuario.usuario.usuario} {userEnemy.usuario.id === salaEstado.ganador ? " ha ganado" : "ha pedido"}</Text>
-          {salaEstado.ganador && salaEstado.finalizada ? (
-            <Text style={styles.winnerText}>Ganador del Juego: {salaEstado.jugadores.find(j => j.id === salaEstado.ganador)?.usuario.usuario.usuario}</Text>
-          ) : (
-            <Text style={styles.infoText}>La partida ha finalizado.</Text>
+          <Text>{userLocal.usuario.usuario.usuario} {userLocal.usuario.id === salaEstado.ganador ? " ha ganado" : "ha perdido"}</Text>
+          <Text>{userEnemy.usuario.usuario.usuario} {userEnemy.usuario.id === salaEstado.ganador ? " ha ganado" : "ha perdido"}</Text>
+          {salaEstado.finalizada && salaEstado.ganador && (
+            <Text style={styles.winnerText}>Ganador: {salaEstado.jugadores.find(j => j.id === salaEstado.ganador)?.usuario.usuario.usuario}</Text>
           )}
-
-          {/* {salaEstado.estado === 'partida-finalizada' && !salaEstado.finalizada && ( // Si la ronda terminó pero no el juego
-            <Button title="Avanzar a Siguiente Ronda" onPress={handleAvanzarRonda} />
-          )} */}
         </View>
-      )}  
+      )}
       {renderPlayingGame()}
       {renderResultsRound()}
-      {/* {salaEstado.estado === 'cartas-ordenadas' && (
-        <Button title="Enfrentar Cartas" onPress={handleEnfrentarCartas} />
-      )} */}
-    <LoadingScreen isLoading={isLoading} text="Cargando partida..." />
+      <LoadingScreen isLoading={isLoading} text="Cargando partida..." />
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
