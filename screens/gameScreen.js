@@ -128,7 +128,19 @@ export default function GameView() {
     return (
       <View style={styles.playerSection}>
         <View style={styles.cardsPlayerContainer}>
-          <Text style={styles.playerName}>{userEnemy.usuario.usuario.usuario}</Text>
+          <View style={styles.nameRow}>
+  <Text style={styles.playerName}>{userLocal.usuario.usuario.usuario}</Text>
+  {userLocal.usuario.usuario.pais && (
+    <>
+      <Text style={styles.playerCountry}> ({userLocal.usuario.usuario.pais})</Text>
+      <Image
+        source={{ uri: `https://flagcdn.com/w40/${userLocal.usuario.usuario.codigoPais.toLowerCase()}.png` }}
+        style={styles.flag}
+      />
+    </>
+  )}
+</View>
+   
           <View style={styles.cardsContainer}>
             {cardsPlayerEnemy.map((card, i) => (
               <View key={`cards-enemy-${i}`} style={styles.cardContainer}>
@@ -165,7 +177,18 @@ export default function GameView() {
                   </View>
                 ))}
           </View>
-          <Text style={styles.playerName}>{userLocal.usuario.usuario.usuario}</Text>
+         <View style={styles.nameRow}>
+  <Text style={styles.playerName}>{userLocal.usuario.usuario.usuario}</Text>
+  {userLocal.usuario.usuario.pais && (
+    <>
+      <Text style={styles.playerCountry}> ({userLocal.usuario.usuario.pais})</Text>
+      <Image
+        source={{ uri: `https://flagcdn.com/w40/${userLocal.usuario.usuario.codigoPais.toLowerCase()}.png` }}
+        style={styles.flag}
+      />
+    </>
+  )}
+</View>
         </View>
 
         <TouchableOpacity style={styles.boton} onPress={playerEmitExit}>
@@ -388,5 +411,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     borderRadius: 4,
   },
-  textoBoton: { color: "#fff", fontWeight: "bold" },
+  textoBoton: { color: "#fff", fontWeight: "bold" 
+  },
+  nameRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginBottom: 8
+},
+playerName: {
+  color: '#fff',
+  fontSize: 18,
+  fontWeight: 'bold'
+},
+playerCountry: {
+  color: '#ccc',
+  fontSize: 14,
+  marginLeft: 4,
+  marginRight: 4
+},
+flag: {
+  width: 28,
+  height: 20,
+  borderRadius: 3,
+  borderWidth: 1,
+  borderColor: '#aaa'
+}
 });

@@ -28,7 +28,9 @@ export function UserTokenProvider({ children }) {
               pfp: decoded.pfp,
               wins: decoded.wins,
               losses: decoded.losses,
-              draws: decoded.draws
+              draws: decoded.draws,
+              pais: decoded.pais,
+              codigoPais: decoded.codigoPais
             });
             AsyncStorage.storeData(AUTH_KEY, userToken)
           } catch (decodeError) {

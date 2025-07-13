@@ -42,7 +42,13 @@ export default function LobbyView() {
           <View style={styles.personalInfo}>
             <Image source={pfp} style={styles.avatar} />
             <Text style={[styles.whiteText, styles.bigText, styles.containerUserTexts]}>
-              <Text>{userData.usuario}{"\n"}</Text>
+              <Text>{userData.usuario}{" "}</Text>
+              {userData.codigoPais && (
+  <Image
+    style={styles.bandera}
+    source={{ uri: `https://flagcdn.com/w80/${userData.codigoPais.toLowerCase()}.png` }}
+  />
+)}
               <Text>Victorias: {wins}{"\n"}</Text>
               <Text>Derrotas: {losses}</Text>
             </Text>
@@ -183,6 +189,14 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     marginVertical: 8,
     fontSize: 18
-  }
+  },
+  bandera: {
+  width: 32,
+  height: 24,
+  marginLeft: 8,
+  borderWidth: 1,
+  borderColor: "#fff",
+  borderRadius: 3
+}
 });
 
