@@ -70,7 +70,7 @@ export default function Login() {
     <ScrollView contentContainerStyle={estilos.contenedor}>
       <View style={estilos.encabezado}>
         <Image
-          source={require("../../../assets/icon.png")}
+          source={require("../../../assets/img/emblem.png")}
           style={estilos.logo}
         />
       </View>

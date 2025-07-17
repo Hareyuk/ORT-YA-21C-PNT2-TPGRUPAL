@@ -4,7 +4,6 @@ import { useNavigation } from "@react-navigation/native";
 import { useTokenUser } from "../hooks/hookToken";
 import LoadingScreen from "../src/components/loading/loading";
 import useGameSocket from "../hooks/useGameSocket";
-//import styles from "../src/styles/stylesGameView"; // Asegúrate de tener este archivo o define tus estilos
 
 export default function GameView() {
   const imageSources = {
@@ -129,7 +128,7 @@ export default function GameView() {
       <View style={styles.playerSection}>
         <View style={styles.cardsPlayerContainer}>
           <View style={styles.nameRow}>
-  <Text style={styles.playerName}>{userLocal.usuario.usuario.usuario}</Text>
+  <Text style={styles.txtInfoGame}>{userLocal.usuario.usuario.usuario}</Text>
   {userLocal.usuario.usuario.pais && (
     <>
       <Text style={styles.playerCountry}> ({userLocal.usuario.usuario.pais})</Text>
@@ -178,7 +177,7 @@ export default function GameView() {
                 ))}
           </View>
          <View style={styles.nameRow}>
-  <Text style={styles.playerName}>{userLocal.usuario.usuario.usuario}</Text>
+  <Text style={styles.txtInfoGame}>{userLocal.usuario.usuario.usuario}</Text>
   {userLocal.usuario.usuario.pais && (
     <>
       <Text style={styles.playerCountry}> ({userLocal.usuario.usuario.pais})</Text>
@@ -203,8 +202,8 @@ export default function GameView() {
 
     return (
       <View style={styles.playerSection}>
-        <Text style={styles.playerName}>Cartas de {userEnemy.usuario.usuario.usuario}</Text>
-        <Text style={styles.playerName}>Tus Cartas ({availableCards.length})</Text>
+        <Text style={styles.txtInfoGame}>Cartas de {userEnemy.usuario.usuario.usuario}</Text>
+        <Text style={styles.txtInfoGame}>Tus Cartas ({availableCards.length})</Text>
         <View style={styles.cardsContainer}>
           {orderedCards.map((card, i) => (
             <View key={i} style={styles.cardContainer}>
@@ -365,7 +364,7 @@ const styles = StyleSheet.create({
     aspectRatio: 4/5,
     height: "auto",
     width: "auto",
-    opacity: 0.5
+    filter: "brightness(0.7)",
   },
   resultsSection: {
     marginTop: 5,
@@ -418,6 +417,11 @@ const styles = StyleSheet.create({
   alignItems: 'center',
   justifyContent: 'center',
   marginBottom: 8
+},
+txtInfoGame: {
+  color: '#000',
+  fontSize: 18,
+  fontWeight: 'bold'
 },
 playerName: {
   color: '#fff',

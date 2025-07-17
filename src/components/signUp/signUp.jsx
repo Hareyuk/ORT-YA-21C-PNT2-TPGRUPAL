@@ -102,7 +102,7 @@ export default function SignUp() {
     <ScrollView contentContainerStyle={estilos.contenedor}>
       <View style={estilos.encabezado}>
         <Image
-          source={require("../../../assets/icon.png")}
+          source={require("../../../assets/img/emblem.png")}
           style={estilos.logo}
         />
       </View>
@@ -112,7 +112,7 @@ export default function SignUp() {
 
 {/* Selección de Imagen de Perfil */}
       <View style={estilos.section}>
-        <Text style={estilos.label}>Selecciona tu Imagen de Perfil:</Text>
+        <Text style={[estilos.label, estilos.txtCentrado]}>Selecciona tu Imagen de Perfil:</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={estilos.pfpOptionsContainer}>
           {randomUrlsImg.map((url, index) => (
             <TouchableOpacity

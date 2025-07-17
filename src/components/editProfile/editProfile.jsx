@@ -213,24 +213,24 @@ export default function EditProfile({ navigation }) {
             source={{ uri: selectedPfp || userData?.pfp}}
             style={estilos.avatar}
           />
-{/* SECCIÓN DE SELECCIÓN DE IMAGEN DE PERFIL */}
-      <View style={estilos.pfpSelectionContainer}>
-        <Text style={estilos.label}>Cambiar Imagen de Perfil:</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={estilos.pfpOptionsScroll}>
-          {pfpOptions.map((url, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => setSelectedPfp(url)}
-              style={[
-                estilos.pfpOption,
-                selectedPfp === url && estilos.selectedPfpOption, // Aplica el estilo de resaltado si está seleccionada
-              ]}
-            >
-              <Image source={{ uri: url }} style={estilos.pfpImage} />
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+          {/* SECCIÓN DE SELECCIÓN DE IMAGEN DE PERFIL */}
+          <View style={estilos.pfpSelectionContainer}>
+            <Text style={[estilos.label, estilos.txtCentrado]}>Cambiar Imagen de Perfil:</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={estilos.pfpOptionsScroll}>
+              {pfpOptions.map((url, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => setSelectedPfp(url)}
+                  style={[
+                    estilos.pfpOption,
+                    selectedPfp === url && estilos.selectedPfpOption, // Aplica el estilo de resaltado si está seleccionada
+                  ]}
+                >
+                  <Image source={{ uri: url }} style={estilos.pfpImage} />
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
       {/* FIN SECCIÓN DE SELECCIÓN DE IMAGEN DE PERFIL */}
 
           <TextInput
@@ -290,8 +290,8 @@ export default function EditProfile({ navigation }) {
         {/* DERECHA */}
         <View style={estilos.right}>
           <Image
-            source={require("../../../assets/icon.png")}
-            style={estilos.placeholder}
+            source={require("../../../assets/img/bgwebform.png")}
+            style={estilos.decorationBg}
           />
         </View>
       </View>

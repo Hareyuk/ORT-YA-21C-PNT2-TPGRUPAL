@@ -5,7 +5,8 @@ export default StyleSheet.create({
   container: {
     flexGrow: 1,
     backgroundColor: "#fff",
-    paddingBottom: 20,
+    height: "100%",
+    flex: 1,
   },
   row: {
     flexDirection: "row",
@@ -22,6 +23,7 @@ export default StyleSheet.create({
     backgroundColor: "#e0e0e0",
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden"
   },
 
   titulo: {
@@ -79,9 +81,11 @@ export default StyleSheet.create({
   marginTop: 20,
   marginBottom: 10,
   width: '100%', // Asegura que ocupe todo el ancho disponible
+  alignSelf: "center"
 },
 pfpOptionsScroll: {
-  // Puedes ajustar la altura máxima si tienes muchas opciones
+  alignContent: "center",
+  alignSelf: "center",
 },
 pfpOption: {
   borderWidth: 2,
@@ -105,6 +109,9 @@ label: { // Si no lo tienes, puedes agregarlo para el texto "Cambiar Imagen de P
   marginBottom: 10,
   color: '#333',
 },
+txtCentrado: { // Si no lo tienes, puedes agregarlo para el texto "Cambiar Imagen de Perfil"
+  textAlign: "center"
+},
 // Asegúrate de que estilos.avatar tenga sus dimensiones y borderRadius para ser circular
 avatar: {
   width: 100,
@@ -113,4 +120,11 @@ avatar: {
   alignSelf: 'center', // Para centrarla en el contenedor
   marginBottom: 20,
 },
+decorationBg:
+{
+  objectFit: "contain",
+  width: "100%", 
+  height: "100%",
+  overflow: "hidden"
+}
 });

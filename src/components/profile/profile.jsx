@@ -9,6 +9,7 @@ export default function ProfileCenter() {
   const {userData} = useTokenUser();
   const foto = userData.pfp;
   const usuario = userData.usuario;
+  const email = userData.email;
   const victorias = userData.wins;
   const derrotas = userData.losses;
 
@@ -22,6 +23,7 @@ export default function ProfileCenter() {
           style={estilos.avatar}
         />
         <Text style={estilos.infoText}>{usuario}</Text>
+        <Text style={estilos.infoText}>{email}</Text>
         <Text style={estilos.infoText}>
           Victorias: {victorias}{"\n"}Derrotas: {derrotas}
         </Text>
@@ -33,8 +35,8 @@ export default function ProfileCenter() {
       {/* Panel derecho */}
       <View style={estilos.right}>
         <Image
-          source={require("../../../assets/icon.png")}
-          style={estilos.placeholder}
+          source={require("../../../assets/img/bgwebform.png")}
+          style={estilos.decorationBg}
         />
       </View>
     </View>

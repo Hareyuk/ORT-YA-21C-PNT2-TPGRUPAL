@@ -3,8 +3,8 @@ import Login from "../src/components/formLogin/login";
 
 export default function LoginView() {
   return (
-    <View>
+    <>
       <Login />
-    </View>
+    </>
   );
 }

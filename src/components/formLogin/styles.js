@@ -3,8 +3,11 @@ import { StyleSheet } from "react-native";
 const estilos = StyleSheet.create({
 contenedor: {
 padding: 20,
+paddingTop: 30,
 alignItems: "center",
 backgroundColor: "#fff",
+height: "100%",
+flex: 1,
 },
 encabezado: {
 alignItems: "center",

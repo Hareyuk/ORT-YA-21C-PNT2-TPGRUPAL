@@ -2,13 +2,16 @@ import { StyleSheet } from "react-native";
 
 const estilos = StyleSheet.create({
 contenedor: {
-padding: 20,
 alignItems: "center",
 backgroundColor: "#fff",
+height: "100%",
+width: "100%",
+flex: 1,
 },
 encabezado: {
 alignItems: "center",
 marginBottom: 10,
+marginTop: 20
 },
 logo: {
 width: 100,
@@ -82,6 +85,9 @@ errorTexto: { // Asegúrate de tener este estilo para los mensajes de error
 },
 botonDeshabilitado: { // Estilo para el botón deshabilitado
   backgroundColor: '#a0d4ff', // Color más claro para el estado deshabilitado
+},
+txtCentrado: { // Si no lo tienes, puedes agregarlo para el texto "Cambiar Imagen de Perfil"
+  textAlign: "center"
 },
 });
 

@@ -5,8 +5,9 @@ export default StyleSheet.create({
   row: {
     flexDirection: "row",
     width: "100%",
-    height: 400,           
+    height: "100%",           
     backgroundColor: "#fff",
+    flex: 1,
   },
   left: {
     flex: 1,
@@ -19,6 +20,7 @@ export default StyleSheet.create({
     backgroundColor: "#e0e0e0",
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden"
   },
   titulo: { fontSize: 20, marginBottom: 12 },
   avatar: {
@@ -43,4 +45,11 @@ export default StyleSheet.create({
     opacity: 0.5,
     resizeMode: "contain",
   },
+  decorationBg:
+  {
+    objectFit: "contain",
+    width: "100%", 
+    height: "100%",
+    overflow: "hidden"
+  }
 });
