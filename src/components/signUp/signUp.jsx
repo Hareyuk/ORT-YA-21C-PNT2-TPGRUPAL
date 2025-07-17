@@ -33,13 +33,13 @@ export default function SignUp() {
   const [confirmarEmailTocado, setConfirmarEmailTocado] = useState(false);
   const [contrasenaTocada, setContrasenaTocada] = useState(false);
   const [confirmarContrasenaTocada, setConfirmarContrasenaTocada] = useState(false);
-
+  const [selectedPfp, setSelectedPfp] = useState(null);
 
   const { apiPostCreateUser } = useApiHooks();
 
   useEffect(() => {
     validarFormulario();
-  }, [usuario, email, confirmarEmail, contrasena, confirmarContrasena]);
+  }, [usuario, email, confirmarEmail, contrasena, confirmarContrasena, selectedPfp]);
 
   const validarFormulario = () => {
     const nuevosErrores = {};
@@ -87,7 +87,7 @@ export default function SignUp() {
       wins: 0,
       losses: 0,
       draws: 0,
-      pfp: randomImg
+      pfp: selectedPfp
     };
 
     try {
@@ -108,6 +108,29 @@ export default function SignUp() {
       </View>
 
       <Text style={estilos.subtitulo}>Crear cuenta</Text>
+{/*999999999999999999999999999999*/}
+
+{/* Selección de Imagen de Perfil */}
+      <View style={estilos.section}>
+        <Text style={estilos.label}>Selecciona tu Imagen de Perfil:</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={estilos.pfpOptionsContainer}>
+          {randomUrlsImg.map((url, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => setSelectedPfp(url)}
+              style={[
+                estilos.pfpOption,
+                selectedPfp === url && estilos.selectedPfpOption, // Aplica el estilo de resaltado
+              ]}
+            >
+              <Image source={{ uri: url }} style={estilos.pfpImage} />
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        {errores.pfp && <Text style={estilos.errorTexto}>{errores.pfp}</Text>}
+      </View>
+      {/* Fin Selección de Imagen de Perfil */}
+
 
      <TextInput
   style={estilos.input}

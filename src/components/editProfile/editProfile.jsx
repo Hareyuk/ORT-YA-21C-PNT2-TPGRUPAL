@@ -19,13 +19,23 @@ import { useTokenUser } from "../../../hooks/hookToken.js";
 export default function EditProfile({ navigation }) {
   const { logOutUser } = useAuthUser();
   const {userData, setUserToken} = useTokenUser();
+
+  {/*9999999999999999999999999999999999999*/}
+  const pfpOptions = [
+    'https://lh3.googleusercontent.com/d/1ydlHT7r6CVDXg5c4Oe9iANmX350sEawy',
+    'https://lh3.googleusercontent.com/d/1r15Oc49pHDdVObz5R5o7kJCZCXQDKztU',
+    'https://lh3.googleusercontent.com/d/1NqxloduuGZUIeriMsaBFS2SoVoSggReZ',
+    'https://lh3.googleusercontent.com/d/1CgbAHsBmh3G3eHUGz4e5vb5EE_4ymoKy',
+    'https://lh3.googleusercontent.com/d/1B_D2HcOoihx6AbKtQ4lDoRCnYffSlT8x',
+    'https://lh3.googleusercontent.com/d/135Gnb9_GS_WExCgDoVWI0qksvYeNChMN'
+  ];
   const [usuario, setUsuario] = useState(userData.usuario);
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errores, setErrores] = useState({});
   const [formValido, setFormValido] = useState(false);
-  const [userPfp, setUserPfp] = useState(userData.pfp)
+  const [selectedPfp, setSelectedPfp] = useState(userData.pfp)
   const { apiPutUpdateUser, apiDeleteUser } = useApiHooks();
 
 
@@ -33,6 +43,7 @@ export default function EditProfile({ navigation }) {
     if (userData) {
       //setUsuario(userData.usuario || "");
       setNewEmail(userData.email || "");
+      setSelectedPfp(userData.pfp || null)
     } else {
 
       //setUsuario("");
@@ -50,7 +61,7 @@ export default function EditProfile({ navigation }) {
   
       validarFormulario();
     
-  }, [usuario, newEmail, newPassword, confirmPassword]);
+  }, [usuario, newEmail, newPassword, confirmPassword, selectedPfp]);
 
   const validarFormulario = () => {
     const nuevosErrores = {};
@@ -83,9 +94,11 @@ export default function EditProfile({ navigation }) {
     setErrores(nuevosErrores);
 
     // controlar el valor actual  con los valores originales 
-    const hayCambios = (usuario.trim() !== (userData?.usuario || "")) ||
+    const hayCambios = (
+      usuario.trim() !== (userData?.usuario || "")) ||
       (newEmail.trim() !== (userData?.email || "")) ||
-      (newPassword.trim() !== "");
+      (newPassword.trim() !== "") ||
+      (selectedPfp !== (userData.pfp || null));
 
     setFormValido(Object.keys(nuevosErrores).length === 0 && hayCambios);
     return Object.keys(nuevosErrores).length === 0 && hayCambios;
@@ -115,6 +128,9 @@ export default function EditProfile({ navigation }) {
     }
     if (newPassword.trim() !== "") {
       dataToUpdate.contrasenia = newPassword; // En el back se llama 'contrasenia'
+    }
+    if (selectedPfp !== (userData?.pfp || null)) { 
+      dataToUpdate.pfp = selectedPfp;
     }
 
     // Si no hay datos para actualizar (ej. el usuario no cambió nada), no hacer la llamada API
@@ -194,9 +210,29 @@ export default function EditProfile({ navigation }) {
         <View style={estilos.left}>
           <Text style={estilos.titulo}>Editar perfil</Text>
           <Image
-            source={userPfp}
+            source={{ uri: selectedPfp || userData?.pfp}}
             style={estilos.avatar}
           />
+{/* SECCIÓN DE SELECCIÓN DE IMAGEN DE PERFIL */}
+      <View style={estilos.pfpSelectionContainer}>
+        <Text style={estilos.label}>Cambiar Imagen de Perfil:</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={estilos.pfpOptionsScroll}>
+          {pfpOptions.map((url, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => setSelectedPfp(url)}
+              style={[
+                estilos.pfpOption,
+                selectedPfp === url && estilos.selectedPfpOption, // Aplica el estilo de resaltado si está seleccionada
+              ]}
+            >
+              <Image source={{ uri: url }} style={estilos.pfpImage} />
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+      {/* FIN SECCIÓN DE SELECCIÓN DE IMAGEN DE PERFIL */}
+
           <TextInput
             disabled
             style={estilos.input}

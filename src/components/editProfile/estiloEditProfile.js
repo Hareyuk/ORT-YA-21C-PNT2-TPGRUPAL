@@ -75,4 +75,42 @@ export default StyleSheet.create({
     resizeMode: "contain",
     opacity: 0.4,
   },
+  pfpSelectionContainer: {
+  marginTop: 20,
+  marginBottom: 10,
+  width: '100%', // Asegura que ocupe todo el ancho disponible
+},
+pfpOptionsScroll: {
+  // Puedes ajustar la altura máxima si tienes muchas opciones
+},
+pfpOption: {
+  borderWidth: 2,
+  borderColor: '#ccc',
+  borderRadius: 50, // Hace que sea circular
+  padding: 5,
+  marginHorizontal: 5,
+},
+selectedPfpOption: {
+  borderColor: '#007AFF', // Color de resaltado para la imagen seleccionada
+  borderWidth: 3,
+},
+pfpImage: {
+  width: 70, // Ajusta el tamaño según sea necesario
+  height: 70, // Ajusta el tamaño según sea necesario
+  borderRadius: 35, // La mitad del ancho/alto para una imagen circular
+},
+label: { // Si no lo tienes, puedes agregarlo para el texto "Cambiar Imagen de Perfil"
+  fontSize: 16,
+  fontWeight: 'bold',
+  marginBottom: 10,
+  color: '#333',
+},
+// Asegúrate de que estilos.avatar tenga sus dimensiones y borderRadius para ser circular
+avatar: {
+  width: 100,
+  height: 100,
+  borderRadius: 50,
+  alignSelf: 'center', // Para centrarla en el contenedor
+  marginBottom: 20,
+},
 });

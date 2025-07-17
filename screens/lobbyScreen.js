@@ -42,14 +42,14 @@ export default function LobbyView() {
           <View style={styles.personalInfo}>
             <Image source={pfp} style={styles.avatar} />
             <Text style={[styles.whiteText, styles.bigText, styles.containerUserTexts]}>
-              <Text>{userData.usuario}{" "}</Text>
+              <Text>{userData.usuario}{""}</Text>
               {userData.codigoPais && (
   <Image
     style={styles.bandera}
     source={{ uri: `https://flagcdn.com/w80/${userData.codigoPais.toLowerCase()}.png` }}
   />
 )}
-              <Text>Victorias: {wins}{"\n"}</Text>
+              <Text>{"\n"}Victorias: {wins}{"\n"}</Text>
               <Text>Derrotas: {losses}</Text>
             </Text>
           </View>

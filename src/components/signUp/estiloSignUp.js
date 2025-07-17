@@ -53,6 +53,36 @@ copyright: {
 fontSize: 12,
 color: "#888",
 },
+pfpOptionsContainer: {
+  flexDirection: 'row',
+  marginTop: 10,
+  marginBottom: 15,
+},
+pfpOption: {
+  borderWidth: 2,
+  borderColor: '#ccc',
+  borderRadius: 50, // Lo hace circular si la imagen es cuadrada
+  padding: 5,
+  marginHorizontal: 5,
+},
+selectedPfpOption: {
+  borderColor: '#007AFF', // Color de resaltado para la imagen seleccionada
+  borderWidth: 3,
+},
+pfpImage: {
+  width: 70, // Ajusta el tamaño según sea necesario
+  height: 70, // Ajusta el tamaño según sea necesario
+  borderRadius: 35, // La mitad del ancho/alto para una imagen circular
+},
+errorTexto: { // Asegúrate de tener este estilo para los mensajes de error
+  color: 'red',
+  fontSize: 12,
+  marginTop: 5,
+  marginBottom: 5,
+},
+botonDeshabilitado: { // Estilo para el botón deshabilitado
+  backgroundColor: '#a0d4ff', // Color más claro para el estado deshabilitado
+},
 });
 
 export default estilos;
