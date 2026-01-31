@@ -17,14 +17,14 @@ export default function LobbyView() {
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [isChecked, setChecked] = useState(false);
-  const [currentRoomState, setCurrentRoomState] = useState(null);
+  const [currentRoomState, setCurrentRoomState] = useState([]);
   const [roomName, setRoomName] = useState('');
 
   const { joinGame, createRoom } = useLobbySocket({ userData, navigation, setCurrentRoomState, setIsLoading }); 
 
-  const handleJoinGame = async () => {
+  const handleJoinGame = async (sala) => {
     try {
-      if (currentRoomState && currentRoomState.jugadores.length >= 2) {
+      if (sala && sala.jugadores.length >= 2) {
         Alert.alert('Sala Llena', 'Esta sala ya tiene dos jugadores. Intenta más tarde.');
         return;
       }
@@ -33,7 +33,7 @@ export default function LobbyView() {
     }
 
     setIsLoading(true);
-    joinGame();
+    joinGame(sala.id);
   };
 
   const handleCreateRoom = () => {
@@ -70,15 +70,19 @@ export default function LobbyView() {
             </View>
 
             <View style={styles.displayListRooms}>
-              {currentRoomState ? (
-                <Room
-                  isPlaying={currentRoomState.estado !== 'esperando-jugadores'}
-                  user1={currentRoomState.jugadores[0] || null}
-                  user2={currentRoomState.jugadores[1] || null}
-                  selectRoom={handleJoinGame}
-                />
+              {currentRoomState && currentRoomState.length > 0 ? (
+                currentRoomState.map((sala, index) => (
+                  <Room
+                    key={sala.id || index}
+                    roomName={sala.nombre}
+                    isPlaying={sala.estado !== 'esperando-jugadores'}
+                    user1={sala.listaJugadores[0] || null}
+                    user2={sala.listaJugadores[1] || null}
+                    selectRoom={() => handleJoinGame(sala)}
+                  />
+                ))
               ) : (
-                <Text style={styles.whiteText}>Cargando información de la sala...</Text>
+                <Text style={styles.whiteText}>Cargando información de las salas...</Text>
               )}
             </View>
 
@@ -162,7 +166,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#1f1714bb",
     padding: 24,
     borderRadius: 16,
-    marginVertical: 24
+    marginVertical: 24,
+    gap: 8,
   },
   personalInfo:
   {
