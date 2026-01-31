@@ -22,6 +22,22 @@ export default function useLobbySocket({ userData, navigation, setCurrentRoomSta
       Alert.alert('Error del Servidor', error.mensaje || 'Ha ocurrido un error desconocido.');
     });
 
+    // Listener para sala creada
+    socket.on('SALA_CREADA', (response) => {
+      console.log('LobbyView - Sala creada:', response);
+      if (response.success) {
+        Alert.alert('Éxito', 'Sala creada correctamente');
+        setCurrentRoomState(response.sala);
+      }
+      setIsLoading(false);
+    });
+
+    // Listener para actualización de lista de salas
+    socket.on('LISTA_SALAS_ACTUALIZADA', (data) => {
+      console.log('LobbyView - Lista de salas actualizada:', data);
+      // Aquí puedes actualizar la lista de salas disponibles si lo necesitas
+    });
+
     // Emitir solicitud inicial
     socket.emit('SOLICITAR_SALA_INICIAL');
 
@@ -29,6 +45,8 @@ export default function useLobbySocket({ userData, navigation, setCurrentRoomSta
     return () => {
       socket.off('ESTADO_SALA_ACTUALIZADO');
       socket.off('ERROR');
+      socket.off('SALA_CREADA');
+      socket.off('LISTA_SALAS_ACTUALIZADA');
     };
   }, []);
 
@@ -41,5 +59,13 @@ export default function useLobbySocket({ userData, navigation, setCurrentRoomSta
     });
   };
 
-  return { joinGame };
+  const createRoom = (nombreSala) => {
+    if (!nombreSala || nombreSala.trim() === '') {
+      Alert.alert('Error', 'Por favor ingresa un nombre para la sala');
+      return;
+    }
+    socket.emit('CREATE_ROOM', { nombreSala: nombreSala.trim() });
+  };
+
+  return { joinGame, createRoom };
 }

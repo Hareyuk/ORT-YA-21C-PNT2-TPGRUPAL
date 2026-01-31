@@ -18,8 +18,9 @@ export default function LobbyView() {
   const [isLoading, setIsLoading] = useState(false);
   const [isChecked, setChecked] = useState(false);
   const [currentRoomState, setCurrentRoomState] = useState(null);
+  const [roomName, setRoomName] = useState('');
 
-  const { joinGame } = useLobbySocket({ userData, navigation, setCurrentRoomState, setIsLoading }); 
+  const { joinGame, createRoom } = useLobbySocket({ userData, navigation, setCurrentRoomState, setIsLoading }); 
 
   const handleJoinGame = async () => {
     try {
@@ -33,6 +34,12 @@ export default function LobbyView() {
 
     setIsLoading(true);
     joinGame();
+  };
+
+  const handleCreateRoom = () => {
+    setIsLoading(true);
+    createRoom(roomName);
+    setRoomName('');
   };
 
   return (
@@ -75,13 +82,22 @@ export default function LobbyView() {
               )}
             </View>
 
-            <View style={styles.containerHorizontalContent}>
+            <View style={{ flexDirection: "column", alignItems: "flex-start", gap: 16 }}>
               <Text style={[styles.whiteText, styles.textInfo]}>Nombre de la nueva sala</Text>
-              <TextInput style={styles.inputTxt} />
-              <View style={{ flexDirection: "column", alignItems: "center" }}>
-                <Text style={[styles.whiteText, styles.textInfo]}>Privado</Text>
-                <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} />
+              <View style={styles.containerHorizontalContent}>
+                <TextInput 
+                  style={styles.inputTxt} 
+                  value={roomName}
+                  onChangeText={setRoomName}
+                  placeholder="Ingresa nombre de la sala"
+                  placeholderTextColor="#999"
+                />
+                <View style={{ flexDirection: "column", alignItems: "center" }}>
+                  <Text style={[styles.whiteText, styles.textInfo]}>Privado</Text>
+                  <Checkbox style={styles.checkbox} value={isChecked} onValueChange={setChecked} />
+                </View>
               </View>
+              <Button texto="Crear sala" cb={handleCreateRoom} />
             </View>
           </View>
         </View>
